@@ -24,21 +24,21 @@ public class Alien extends Character {
 
     private static Polygon createPolygon() {
         Polygon polygon = new Polygon(-15, 0, -10, -10, 10, -10, 15, 0, 10, 10, -10, 10);
-//        polygon.setFill(Color.BLACK);
+        polygon.setFill(Color.BLUE);
         return polygon;
     }
 
     @Override
     public void move() {
     	super.move();
-        double changeX = (random.nextDouble() * 1.5 - 1) * 0.2;
-        double changeY = (random.nextDouble() * 1.5 - 1) * 0.2;
+        double changeX = (random.nextDouble() * 3 - 1) * 0.3;
+        double changeY = (random.nextDouble() * 3 - 1) * 0.3;
 
         Point2D newMovement = movement.add(changeX, changeY);
         
-        if (newMovement.magnitude() < 2) {
+        if (newMovement.magnitude() < 5) {
             movement = newMovement;
-            setMovement(getMovement().multiply(0.5));
+            setMovement(getMovement().multiply(0.7));
         }
         
 

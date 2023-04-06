@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Point2D;
 import javafx.scene.Scene;
@@ -17,10 +18,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 public class AsteroidsApplication extends Application {
 
 	public static int WIDTH = 800;
     public static int HEIGHT = 450;
+    public static int MAX_ALIENS = 3;
 
     long lastProjectileTime = 0;
     long lastAsteroidTime = 0;
@@ -32,9 +37,21 @@ public class AsteroidsApplication extends Application {
         Pane pane = new Pane();
         pane.setPrefSize(WIDTH, HEIGHT);
 
-        Alien alien = new Alien((int)Math.random() * WIDTH, (int)Math.random()* HEIGHT);
         
         Ship ship = new Ship(WIDTH / 2, HEIGHT / 2);
+        
+//        Alien alien = new Alien((int)Math.random() * WIDTH, (int)Math.random()* HEIGHT);
+        //Generate an alien ship every certain time
+        List<Alien> aliens = new ArrayList<>();
+        Timeline alienGenerator = new Timeline(new KeyFrame(Duration.seconds(5), event -> {
+            if (aliens.size() < MAX_ALIENS) {
+                Alien alien = new Alien((int)Math.random() * WIDTH, (int)Math.random()* HEIGHT);
+                aliens.add(alien);
+                pane.getChildren().add(alien.getCharacter());
+            }
+        }));
+        alienGenerator.setCycleCount(Timeline.INDEFINITE);
+        alienGenerator.play();
         List<Projectile> projectiles = new ArrayList<>();
         List<Asteroid> asteroids = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -45,8 +62,8 @@ public class AsteroidsApplication extends Application {
 
         pane.getChildren().add(ship.getCharacter());
         asteroids.forEach(asteroid -> pane.getChildren().add(asteroid.getCharacter()));
-        pane.getChildren().add(alien.getCharacter());
-
+        aliens.forEach(alien -> pane.getChildren().add(alien.getCharacter()));
+        
         Scene scene = new Scene(pane);
         Map<KeyCode, Boolean> pressedKeys = new HashMap<>();
 
@@ -88,10 +105,22 @@ public class AsteroidsApplication extends Application {
                         pane.getChildren().add(projectile.getCharacter());
                     }
                 }
+                
+//            	long timeBetweenAlienProjectiles = 10_000_000_000L;
+//                long now2 = System.nanoTime();
+//                long lastAlienProjectileTime = 0;
+//				if (now2 - lastAlienProjectileTime > timeBetweenAlienProjectiles) {
+//                    lastAlienProjectileTime = now2;
+//                    Projectile alienProjectile = new Projectile((int) alien.getCharacter().getTranslateX(), (int) alien.getCharacter().getTranslateY());
+//                    alienProjectile.getCharacter().setRotate(alien.getCharacter().getRotate());
+//                    projectiles.add(alienProjectile);
+//                    alienProjectile.accelerate();
+//                    alienProjectile.setMovement(new Point2D(Math.cos(Math.toRadians(alien.getCharacter().getRotate())), Math.sin(Math.toRadians(alien.getCharacter().getRotate()))).multiply(3));
+//                    pane.getChildren().add(alienProjectile.getCharacter());
+//                }
 
                 ship.move();
-                alien.move();
-
+                aliens.forEach(alien -> alien.move());
                 asteroids.forEach(asteroid -> asteroid.move());
                 projectiles.forEach(projectile -> projectile.move());
                 projectiles.forEach(projectile -> {
@@ -104,10 +133,12 @@ public class AsteroidsApplication extends Application {
 
                 });
                 projectiles.forEach(projectile -> {
-                	if(projectile.collide(alien)) {
-                        projectile.setAlive(false);
-                        alien.setAlive(false);
-                    }
+                	aliens.forEach(alien -> {
+                        if(projectile.collide(alien)) {
+                            projectile.setAlive(false);
+                            alien.setAlive(false);
+                        }
+                    });
 
                 });
                 
@@ -116,6 +147,7 @@ public class AsteroidsApplication extends Application {
                     List<Asteroid> collisions = asteroids.stream()
                                                                 .filter(asteroid -> asteroid.collide(projectile))
                                                                 .collect(Collectors.toList());
+                    
 
                     if(collisions.isEmpty()) {
                         return false;
@@ -129,6 +161,23 @@ public class AsteroidsApplication extends Application {
                     return true;
                 }).collect(Collectors.toList());
                 
+                List<Projectile> projectilesToRemove1 = projectiles.stream().filter(projectile -> {
+                    List<Alien> collisions = aliens.stream()
+                                                                .filter(alien -> alien.collide(projectile))
+                                                                .collect(Collectors.toList());
+                    
+
+                    if(collisions.isEmpty()) {
+                        return false;
+                    }
+
+                    collisions.stream().forEach(collided -> {
+                        aliens.remove(collided);
+                        pane.getChildren().remove(collided.getCharacter());
+                    });
+
+                    return true;
+                }).collect(Collectors.toList());
                 
 
                 projectilesToRemove.forEach(projectile -> {
@@ -136,6 +185,10 @@ public class AsteroidsApplication extends Application {
                     projectiles.remove(projectile);
                 });
 
+                projectilesToRemove1.forEach(projectile -> {
+                    pane.getChildren().remove(projectile.getCharacter());
+                    projectiles.remove(projectile);
+                });
                 
                 asteroids.forEach(asteroid -> {
                     if (ship.collide(asteroid)) {
@@ -143,9 +196,14 @@ public class AsteroidsApplication extends Application {
                     }
                 });
              // Check for collisions between ship and aliens
-                if (ship.collide(alien)) {
-                    stop();
-                }
+                aliens.forEach(alien -> {
+                    if (ship.collide(alien)) {
+                        stop();
+                    }
+                });
+//                if (ship.collide(alien)) {
+//                    stop();
+//                }
             }
 
         }.start();
