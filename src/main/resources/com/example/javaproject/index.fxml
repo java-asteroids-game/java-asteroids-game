@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.Bloom?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="600.0" prefWidth="960.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.javaproject.IndexController">
+    <children>
+        <Label fx:id="startgame" layoutX="367.0" layoutY="339.0" onMouseClicked="#mouseClickStart" onMouseEntered="#mouseEnterStart" onMouseExited="#mouseExiteStart" prefHeight="43.0" prefWidth="258.0" text="START GAME" textAlignment="CENTER" textFill="WHITE">
+            <font>
+                <Font name="Arial" size="38.0" />
+            </font>
+            <effect>
+                <Bloom />
+            </effect>
+        </Label>
+        <Label fx:id="highscore" layoutX="372.0" layoutY="422.0" onMouseClicked="#mouseClickScore" onMouseEntered="#mouseEnterScore" onMouseExited="#mouseExitScore" prefHeight="62.0" prefWidth="248.0" text="HIGH SCORE" textFill="WHITE">
+            <font>
+                <Font name="Arial" size="38.0" />
+            </font>
+            <effect>
+                <Bloom />
+            </effect>
+        </Label>
+        <Label layoutX="465.0" layoutY="124.0" textFill="WHITE" />
+        <Label layoutX="322.0" layoutY="115.0" text="Asteroids Game" textFill="WHITE">
+            <font>
+                <Font size="52.0" />
+            </font>
+            <effect>
+                <Bloom />
+            </effect>
+        </Label>
+    </children>
+</AnchorPane>
