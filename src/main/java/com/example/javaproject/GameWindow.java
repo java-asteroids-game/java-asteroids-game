@@ -18,6 +18,7 @@ public class GameWindow{
     //game window size
     public static final int WIDTH = 960;
     public static final int HEIGHT = 600;
+    int framesSinceLastShot = 0;
 
 
     public void load(Stage stage, int numAsteroids){
@@ -88,6 +89,10 @@ public class GameWindow{
 
             @Override
             public void handle(long now) {
+
+                boolean moveAndShootPressed = (pressedKeys.getOrDefault(KeyCode.LEFT, false)||pressedKeys.getOrDefault(KeyCode.RIGHT, false)||pressedKeys.getOrDefault(KeyCode.UP, false))
+                        && pressedKeys.getOrDefault(KeyCode.SPACE, false);
+
                 if (pressedKeys.getOrDefault(KeyCode.LEFT, false)) {
                     ship.turnLeft();
                 }
@@ -99,17 +104,29 @@ public class GameWindow{
                     ship.accelerate();
                 }
 
-                if (pressedKeys.getOrDefault(KeyCode.SPACE, false)){
-                    // When shooting the bullet in the same direction as the ship
-                    Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
-                            (int) ship.getCharacter().getTranslateY());
 
-                    shot.getCharacter().setRotate(ship.getCharacter().getRotate());
-                    shoots.add(shot);
-                    shot.move();
-                    pane.getChildren().add(shot.getCharacter());
-                    pressedKeys.clear();
+                //can use an or operator here, as logically if moveAndShootPressed is true, then Space must be pressed
+                if (pressedKeys.getOrDefault(KeyCode.SPACE, false)||moveAndShootPressed) {
+                    // Check if enough frames have passed since the last shot
+                    if (framesSinceLastShot >= 10) {
+                        // When shooting the bullet in the same direction as the ship
+                        Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
+                                (int) ship.getCharacter().getTranslateY());
+
+                        shot.getCharacter().setRotate(ship.getCharacter().getRotate());
+                        shoots.add(shot);
+                        shot.move();
+                        pane.getChildren().add(shot.getCharacter());
+
+                        // Reset the framesSinceLastShot counter
+                        framesSinceLastShot = 0;
+                    }
+                    //pressedKeys.clear();
                 }
+
+                // Increment the framesSinceLastShot counter on each frame
+                framesSinceLastShot++;
+
                 if(pressedKeys.getOrDefault(KeyCode.SHIFT,false)){
                     asteroids.forEach(asteroid -> {
                         ship.character.setTranslateX(Math.random()*WIDTH);
@@ -120,7 +137,7 @@ public class GameWindow{
                             ship.character.setTranslateY(Math.random()*HEIGHT);
                         }
                     });
-                    pressedKeys.clear();
+                    //pressedKeys.clear();
 
                 }
 
@@ -128,10 +145,24 @@ public class GameWindow{
                 alienShip.move();
                 asteroids.forEach(asteroid -> asteroid.move());
 
+                /*
                 // shooting
-                shoots.forEach(shoot -> shoot.move());
-
-
+                shoots.forEach(shoot -> {
+                    if(shoot.outOfBounds()) {
+                        shoots.remove(shoot);
+                    }else{shoot.move();}
+                });
+                 */
+                //iterator required to avoid concurrent modification exception (removing item from list while iterating through it)
+                Iterator<Projectile> iterator = shoots.iterator();
+                while(iterator.hasNext()) {
+                    Projectile shoot = iterator.next();
+                    if(shoot.outOfBounds()) {
+                        iterator.remove();
+                    } else {
+                        shoot.move();
+                    }
+                }
 
                 List<Projectile> destroy_asteroid = shoots.stream().filter(shot -> {
                     List<Asteroid> destroy = asteroids.stream()

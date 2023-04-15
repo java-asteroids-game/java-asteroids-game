@@ -38,4 +38,15 @@ public class Projectile extends AbstractGameElement {
         Shape collisionArea = Shape.intersect(this.character, other.getCharacter());
         return collisionArea.getBoundsInLocal().getWidth() != -1;
     }
+
+    public boolean outOfBounds(){
+        // Check if projectile is out of bounds
+        if (this.getCharacter().getTranslateX() < 0 || this.getCharacter().getTranslateX() > GameWindow.WIDTH ||
+                this.getCharacter().getTranslateY() < 0 || this.getCharacter().getTranslateY() > GameWindow.HEIGHT) {
+            // Remove the projectile from the game window
+            //this.Alive=false;
+            return true;
+        }
+        return false;
+    }
 }
