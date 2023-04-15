@@ -69,9 +69,7 @@ public class GameWindow{
         Asteroid asteroid_special=new Asteroid(WIDTH/2,500,40,l);
         asteroids.add(asteroid_special);
 
-
         asteroids.forEach(asteroid -> pane.getChildren().add(asteroid.getCharacter()));
-
 
         List<Projectile> shoots = new ArrayList<>();
         //control ship
@@ -90,23 +88,24 @@ public class GameWindow{
             @Override
             public void handle(long now) {
 
-                boolean moveAndShootPressed = (pressedKeys.getOrDefault(KeyCode.LEFT, false)||pressedKeys.getOrDefault(KeyCode.RIGHT, false)||pressedKeys.getOrDefault(KeyCode.UP, false))
-                        && pressedKeys.getOrDefault(KeyCode.SPACE, false);
 
-                if (pressedKeys.getOrDefault(KeyCode.LEFT, false)) {
+                if (pressedKeys.getOrDefault(KeyCode.A, false) && !pressedKeys.getOrDefault(KeyCode.RIGHT, false)) {
                     ship.turnLeft();
                 }
 
-                if (pressedKeys.getOrDefault(KeyCode.RIGHT, false)) {
+                if (pressedKeys.getOrDefault(KeyCode.D, false) && !pressedKeys.getOrDefault(KeyCode.LEFT, false)) {
                     ship.turnRight();
                 }
-                if (pressedKeys.getOrDefault(KeyCode.UP, false)) {
+
+                if (pressedKeys.getOrDefault(KeyCode.W, false)) {
                     ship.accelerate();
                 }
 
+                boolean moveAndShootPressed = (pressedKeys.getOrDefault(KeyCode.D, false)||pressedKeys.getOrDefault(KeyCode.A, false)||pressedKeys.getOrDefault(KeyCode.W, false))
+                        && pressedKeys.getOrDefault(KeyCode.SPACE, false);
 
                 //can use an or operator here, as logically if moveAndShootPressed is true, then Space must be pressed
-                if (pressedKeys.getOrDefault(KeyCode.SPACE, false)||moveAndShootPressed) {
+                if (pressedKeys.getOrDefault(KeyCode.SPACE, false) || moveAndShootPressed) {
                     // Check if enough frames have passed since the last shot
                     if (framesSinceLastShot >= 10) {
                         // When shooting the bullet in the same direction as the ship
