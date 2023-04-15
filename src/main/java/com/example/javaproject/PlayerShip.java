@@ -32,20 +32,20 @@ public class PlayerShip extends AbstractGameElement {
     }
 
     public void turnLeft() {
-        this.character.setRotate(this.character.getRotate() - 3);
+        this.character.setRotate(this.character.getRotate() - 4);
     }
 
 
     public void turnRight() {
-        this.character.setRotate(this.character.getRotate() + 3);
+        this.character.setRotate(this.character.getRotate() + 4);
     }
 
     public void accelerate() {
         double changeX = Math.cos(Math.toRadians(this.getCharacter().getRotate()));
         double changeY = Math.sin(Math.toRadians(this.getCharacter().getRotate()));
 
-        changeX *= 0.01;
-        changeY *= 0.01;
+        changeX *= 0.04;
+        changeY *= 0.04;
         this.movement = this.movement.add(changeX, changeY);
     }
 

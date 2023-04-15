@@ -36,7 +36,7 @@ public class Pane {
     }
 
     public void gameStart() {
-        game.load(stage);
+        game.load(stage,3);
     }
 
 //    public void scorelist() {

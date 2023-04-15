@@ -20,7 +20,7 @@ public class GameWindow{
     public static final int HEIGHT = 600;
 
 
-    public void load(Stage stage){
+    public void load(Stage stage, int numAsteroids){
         Pane pane = new Pane();
         pane.setPrefSize(WIDTH, HEIGHT);
         // Background color
@@ -33,7 +33,7 @@ public class GameWindow{
         PlayerShip ship = new PlayerShip(WIDTH/2, HEIGHT/2);
         EnemyShip alienShip = new EnemyShip(alien_rnd.nextInt(WIDTH), alien_rnd.nextInt(HEIGHT));
 
-        //getchildredn method to add a shape
+        //getchildren method to add a shape
         pane.getChildren().add(ship.getCharacter());
         pane.getChildren().add(alienShip.getCharacter());
 
@@ -58,7 +58,7 @@ public class GameWindow{
 
         List<Asteroid> asteroids = new ArrayList<>();
         double l=0.1;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < numAsteroids; i++) {
             Random rnd= new Random();
             double rnd_1= Math.random()*10+30;
             Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),rnd_1,l);
@@ -171,12 +171,26 @@ public class GameWindow{
                         level.set(level.get() + 1);
                         text1.setText("Current level: " + level);
                         asteroids.forEach(asteroid -> {
-                            asteroid.move_speed+=(0.3 * level.get());
+                            asteroid.move_speed+=(0.1 * level.get());
                         });
                     }
                     text.setText("Current Points: " + points);
 
                 });
+
+                if (asteroids.isEmpty()) {
+                    int newNumAsteroids = numAsteroids + 1;
+                    double newScale = scale + 0.1;
+                    for (int i = 0; i < newNumAsteroids; i++) {
+                        Random rnd= new Random();
+                        double rnd_1= Math.random()*10+30;
+                        Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),rnd_1,newScale);
+                        asteroids.add(asteroid);
+                        pane.getChildren().add(asteroid.getCharacter());
+                    }
+                    level.incrementAndGet();
+                    text1.setText("Current Level: " + level.get());
+                }
 
                 // Hyper jumps and random reborn position
                 double random_x = Math.random() * 1000 % WIDTH;

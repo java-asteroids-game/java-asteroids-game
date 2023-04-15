@@ -35,18 +35,44 @@ public class Asteroid<move_speed> extends AbstractGameElement {
 //        return S;
 //    } */
 
-    public  void move () {
+    public void move() {
         double changeX = Math.cos(Math.toRadians(this.getCharacter().getRotate()));
         double changeY = Math.sin(Math.toRadians(this.getCharacter().getRotate()));
 
-        this.getCharacter().setTranslateX(getCharacter().getTranslateX() + changeX*this.move_speed);
-        this.getCharacter().setTranslateY(this.getCharacter().getTranslateY() + changeY*this.move_speed);
+        // Get the current position of the asteroid
+        double currentX = this.getCharacter().getTranslateX();
+        double currentY = this.getCharacter().getTranslateY();
+
+        // Calculate the new position of the asteroid
+        double newX = currentX + changeX * this.move_speed;
+        double newY = currentY + changeY * this.move_speed;
+
+        // Check if the asteroid is off the screen
+        if (newX < -this.getSize()) {
+            // Wrap the asteroid to the right side of the screen
+            newX = GameWindow.WIDTH + this.getSize();
+        } else if (newX > GameWindow.WIDTH + this.getSize()) {
+            // Wrap the asteroid to the left side of the screen
+            newX = -this.getSize();
+        }
+
+        if (newY < -this.getSize()) {
+            // Wrap the asteroid to the bottom of the screen
+            newY = GameWindow.HEIGHT + this.getSize();
+        } else if (newY > GameWindow.HEIGHT + this.getSize()) {
+            // Wrap the asteroid to the top of the screen
+            newY = -this.getSize();
+        }
+
+        // Update the position of the asteroid
+        this.getCharacter().setTranslateX(newX);
+        this.getCharacter().setTranslateY(newY);
     }
     public double getSize(){
         return this.size;
     }
     public double Move_speed_up(){
-        this.move_speed+=0.3;
+        this.move_speed+=0.1;
         return this.move_speed;
     }
 
