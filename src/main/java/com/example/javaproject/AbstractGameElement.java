@@ -67,6 +67,14 @@ public abstract class AbstractGameElement {
         }
     }
 
+    public Point2D getMovement(){
+        return this.movement;
+    }
+
+    public void setMovement(Point2D movement){
+        this.movement = movement;
+    }
+
 
 
     public abstract void move();
