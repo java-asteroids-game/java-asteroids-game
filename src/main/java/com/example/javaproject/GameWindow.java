@@ -3,6 +3,8 @@ package com.example.javaproject;
 // Imports required packages
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -14,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +25,9 @@ public class GameWindow{
     //game window size
     public static final int WIDTH = 960;
     public static final int HEIGHT = 600;
+    public static int MAX_ALIENS = 2;
+    public int MAX_GENERATE_ALIENS = 3;
+    int count_aliens = 0;
     int framesSinceLastShot = 0;
 
     ScoreManager scoreManager = new ScoreManager();
@@ -38,11 +44,11 @@ public class GameWindow{
         Random alien_rnd = new Random();
 
         PlayerShip ship = new PlayerShip(WIDTH/2, HEIGHT/2);
-        EnemyShip alienShip = new EnemyShip(alien_rnd.nextInt(WIDTH), alien_rnd.nextInt(HEIGHT));
+//        EnemyShip alienShip = new EnemyShip(alien_rnd.nextInt(WIDTH), alien_rnd.nextInt(HEIGHT));
 
         //getchildren method to add a shape
         pane.getChildren().add(ship.getCharacter());
-        pane.getChildren().add(alienShip.getCharacter());
+//        pane.getChildren().add(alienShip.getCharacter());
 
         // Show current points ,current level, and current HP
         Text text = new Text(10, 20, "Current Points: 0");
@@ -61,6 +67,33 @@ public class GameWindow{
         // Initial value
         AtomicInteger level = new AtomicInteger(1);
         AtomicInteger HP= new AtomicInteger(3);
+
+
+//        List<EnemyShip> alienShip = new ArrayList<>();
+//        Timeline alienGenerator = new Timeline(new KeyFrame(Duration.seconds(5), event -> {
+//            if (alienShip.size() < MAX_ALIENS && count_aliens < MAX_GENERATE_ALIENS) {
+//                EnemyShip alien = new EnemyShip((int)Math.random() * WIDTH, (int)Math.random()* HEIGHT);
+//                alienShip.add(alien);
+//                pane.getChildren().add(alien.getCharacter());
+//                count_aliens ++;
+//            }
+//        }));
+//        alienGenerator.setCycleCount(Timeline.INDEFINITE);
+//        alienGenerator.play();
+//
+//        //create the alien project, duration.second means the interval of shooting.
+//        List<Projectile> alienProjectiles = new ArrayList<>();
+//        Timeline alienProjectileGenerator = new Timeline(new KeyFrame(Duration.seconds(2), event -> {
+//            for (EnemyShip alien : alienShip) {
+//                Projectile alienProjectile = alien.shootAtTarget(ship);
+//                alienProjectiles.add(alienProjectile);
+//                pane.getChildren().add(alienProjectile.getCharacter());
+//
+//            }
+//        }));
+//        alienProjectileGenerator.setCycleCount(Timeline.INDEFINITE);
+//        alienProjectileGenerator.play();
+
 
 
         List<Asteroid> asteroids = new ArrayList<>();
@@ -87,6 +120,36 @@ public class GameWindow{
         scene.setOnKeyReleased(event -> {
             pressedKeys.put(event.getCode(), Boolean.FALSE);
         });
+
+
+//        //alien projectile move
+//        alienProjectiles.forEach(projectile -> projectile.move());
+//        //alien projectiles collide player ship
+//        alienProjectiles.forEach(projectile -> {
+//            if (ship.collide(projectile)) {
+//                HP.set(HP.get() - 1);
+//                if(HP.get()>0) {
+//                    //get Children method to add a shape
+//                    ship.character.setTranslateX((double) WIDTH / 2);
+//                    ship.character.setTranslateY(500);
+//                    while (!isPositionSafe(WIDTH / 2, 500, ship, asteroids, shoots, alienShip , 100));
+//                    text2.setText("Current HP: " + HP);
+//                }else
+//                {
+//                    text2.setText("GameOver");
+//
+//                }
+//            }
+//        });
+//        //alien projectiles steam, remove dead alien projectiles
+//        List<Projectile> deadAlienProjectiles = alienProjectiles.stream()
+//                .filter(projectile -> !projectile.isAlive())
+//                .toList();
+//
+//        deadAlienProjectiles.forEach(projectile -> {
+//            pane.getChildren().remove(projectile.getCharacter());
+//            alienProjectiles.remove(projectile);
+//        });
 
 
         new AnimationTimer() {
@@ -147,7 +210,7 @@ public class GameWindow{
                 }
 
                 ship.move();
-                alienShip.move();
+//                alienShip.move();
                 asteroids.forEach(asteroid -> asteroid.move());
 
                 /*
@@ -306,56 +369,20 @@ public class GameWindow{
                                 // Add the VBox to the pane
                                 gameOverPane.getChildren().add(gameOverContainer);
 
-                                // Animate the pane by changing its opacity from 0 to 1 and back to 0 repeatedly
-//                                Timeline animation = new Timeline(
-//                                        new KeyFrame(Duration.seconds(0), event -> gameOverPane.setOpacity(0.0)),
-//                                        new KeyFrame(Duration.seconds(0.5), event -> gameOverPane.setOpacity(1.0)),
-//                                        new KeyFrame(Duration.seconds(1), event -> gameOverPane.setOpacity(0.0))
-//                                );
-//
-//                                animation.setCycleCount(3);
-//                                animation.play();
+//                                 Animate the pane by changing its opacity from 0 to 1 and back to 0 repeatedly
+                                Timeline animation = new Timeline(
+                                        new KeyFrame(Duration.seconds(0), event -> gameOverPane.setOpacity(0.0)),
+                                        new KeyFrame(Duration.seconds(0.5), event -> gameOverPane.setOpacity(1.0)),
+                                        new KeyFrame(Duration.seconds(1), event -> gameOverPane.setOpacity(0.0))
+                                );
+
+                                animation.setCycleCount(3);
+                                animation.play();
 
                                 // Add the game over pane to the root pane
                                 pane.getChildren().add(gameOverPane);
                                 gameOverPane.setTranslateX((pane.getWidth() - gameOverPane.getWidth()) / 2.8);
                                 gameOverPane.setTranslateY((pane.getHeight() - gameOverPane.getHeight()) / 2.5);
-//                                the below code is not working so we chose to add x/y translations directly to center the game over text
-//                                StackPane.setAlignment(gameOverPane, Pos.CENTER);
-
-//                            Platform.runLater(() -> {
-//                                // Show a dialogue box asking for the user's name
-//                                TextInputDialog dialog = new TextInputDialog();
-//                                dialog.setTitle("Enter Your Name");
-//                                dialog.setHeaderText(null);
-//                                dialog.setContentText("Please enter your name:");
-//                                Optional<String> result = dialog.showAndWait();
-//
-//                                // Check if the user entered a name and save it to userName variable
-//                                String userName = "";
-//                                if (result.isPresent()) {
-//                                    userName = result.get();
-//                                }
-//                                scoreManager ScoreManager = new scoreManager();
-//                                ScoreManager.appendScoreToFile(userName, points);
-//                            });
-
-                                // Show a dialogue box asking for the user's name
-//                                TextInputDialog dialog = new TextInputDialog();
-//                                dialog.setTitle("Enter Your Name");
-//                                dialog.setHeaderText(null);
-//                                dialog.setContentText("Please enter your name:");
-//                                Optional<String> result = dialog.showAndWait();
-//
-//                                // Check if the user entered a name and save it to userName variable
-//                                String userName = "";
-//                                if (result.isPresent()) {
-//                                    userName = result.get();
-//                                }
-//
-//                                //SAVING YOUR POINTS LOCALLY TO FILE FOR HIGH SCORE CALCULATION
-//                                scoreManager ScoreManager = new scoreManager();
-//                                ScoreManager.appendScoreToFile(userName, points);
 
                             }
                         }
@@ -382,4 +409,32 @@ public class GameWindow{
         stage.setScene(scene);
         stage.show();
     }
+
+    //Determine if the location is safe
+//    public boolean isPositionSafe(double x, double y, PlayerShip player, List<Asteroid> asteroids, List<Projectile> projectiles, List<EnemyShip> aliens, double safeDistance) {
+//        Point2D newPosition = new Point2D(x, y);
+//
+//        // Check for collisions with asteroids
+//        for (Asteroid asteroid : asteroids) {
+//            if (newPosition.distance(asteroid.getCharacter().getTranslateX(), asteroid.getCharacter().getTranslateY()) < safeDistance) {
+//                return false;
+//            }
+//        }
+//
+//        // Check for collisions with projectiles
+//        for (Projectile projectile : projectiles) {
+//            if (newPosition.distance(projectile.getCharacter().getTranslateX(), projectile.getCharacter().getTranslateY()) < safeDistance) {
+//                return false;
+//            }
+//        }
+//
+//        // Check for collisions with alien ships
+//        for (EnemyShip  alien : aliens) {
+//            if (newPosition.distance(alien.getCharacter().getTranslateX(), alien.getCharacter().getTranslateY()) < safeDistance) {
+//                return false;
+//            }
+//        }
+//
+//        return true;
+//    }
 }

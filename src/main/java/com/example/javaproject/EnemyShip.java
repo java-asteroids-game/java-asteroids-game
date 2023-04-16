@@ -51,9 +51,18 @@ public class EnemyShip extends AbstractGameElement {
         bounceOffScreen();
     }
 
-//    public Projectile shootAtTarget(PlayerShip target){
-//        return
-//    }
+
+    public Projectile shootAtTarget(PlayerShip target){
+        // Set location to enemy ship location
+        Projectile projectile = new Projectile((int) this.getCharacter().getTranslateX(), (int) this.getCharacter().getTranslateY());
+        // Get direction to playership
+        Point2D direction = new Point2D(target.getCharacter().getTranslateX() - projectile.getCharacter().getTranslateX(),
+                target.getCharacter().getTranslateY() - projectile.getCharacter().getTranslateY());
+
+        projectile.setMovement(direction.normalize().multiply(2));
+
+        return projectile;
+    }
 
 
 

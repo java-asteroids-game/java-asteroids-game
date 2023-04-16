@@ -4,8 +4,19 @@ import javafx.scene.shape.Shape;
 
 public class Projectile extends AbstractGameElement {
 
+    private static final int MAX_FLIGHT_TIME = 180;
+    private static final int MAX_TRAVEL_DISTANCE = 1000;
+    private int timeToLive;
+    private double traveledDistance;
+    private final long creationTime;
+    public  boolean alive;
+
+
     public Projectile(int x, int y) {
         super(new CharacterFactory().createBullet(), x, y);
+        this.timeToLive = MAX_FLIGHT_TIME;
+        this.creationTime = System.nanoTime();
+        this.alive = true;
     }
 
 
@@ -32,5 +43,10 @@ public class Projectile extends AbstractGameElement {
             return true;
         }
         return false;
+    }
+
+    public boolean isAlive() {
+        long elapsedTime = (System.nanoTime() - creationTime) / 1_000_000_000;
+        return alive && elapsedTime < timeToLive;
     }
 }
