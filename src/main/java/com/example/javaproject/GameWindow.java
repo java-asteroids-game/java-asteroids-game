@@ -5,6 +5,7 @@ package com.example.javaproject;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -25,9 +26,6 @@ public class GameWindow{
     //game window size
     public static final int WIDTH = 960;
     public static final int HEIGHT = 600;
-    public static int MAX_ALIENS = 2;
-    public int MAX_GENERATE_ALIENS = 3;
-    int count_aliens = 0;
     int framesSinceLastShot = 0;
 
     ScoreManager scoreManager = new ScoreManager();
@@ -36,19 +34,14 @@ public class GameWindow{
     public void load(Stage stage, int numAsteroids){
         Pane pane = new Pane();
         pane.setPrefSize(WIDTH, HEIGHT);
-        // Background color
         pane.setStyle("-fx-background-color: black");
 
 
-        // Center position
-        Random alien_rnd = new Random();
-
         PlayerShip ship = new PlayerShip(WIDTH/2, HEIGHT/2);
-//        EnemyShip alienShip = new EnemyShip(alien_rnd.nextInt(WIDTH), alien_rnd.nextInt(HEIGHT));
+        final EnemyShip alienShip = new EnemyShip(WIDTH/2, HEIGHT / 2);
 
-        //getchildren method to add a shape
+        //get children method to add a shape
         pane.getChildren().add(ship.getCharacter());
-//        pane.getChildren().add(alienShip.getCharacter());
 
         // Show current points ,current level, and current HP
         Text text = new Text(10, 20, "Current Points: 0");
@@ -63,45 +56,41 @@ public class GameWindow{
         pane.getChildren().add(text);
         pane.getChildren().add(text1);
         pane.getChildren().add(text2);
-        AtomicInteger points = new AtomicInteger();
-        // Initial value
+
+        // Set atomic integers with initial values
+        AtomicInteger points = new AtomicInteger(0);
         AtomicInteger level = new AtomicInteger(1);
         AtomicInteger HP= new AtomicInteger(3);
 
+        // Creates the generator for the alien. Sets up 2 timeline events to check if the alien is alive and shoot bullets
+        Timeline alienGenerator = new Timeline();
+        alienGenerator.getKeyFrames().addAll(
+                new KeyFrame(Duration.seconds(10), event -> {
+                    if (!alienShip.isAlive()) {
+                        alienShip.getCharacter().setTranslateX(Math.random() * WIDTH);
+                        alienShip.getCharacter().setTranslateY(Math.random() * WIDTH);
+                        pane.getChildren().add(alienShip.getCharacter());
+                        alienShip.setAlive(true);
+                    }
+                }),
+                new KeyFrame(Duration.seconds(2), event -> {
+                    if (alienShip.isAlive()) {
+                        alienShip.shootAtTarget(ship);
+                    }
+                })
+        );
 
-//        List<EnemyShip> alienShip = new ArrayList<>();
-//        Timeline alienGenerator = new Timeline(new KeyFrame(Duration.seconds(5), event -> {
-//            if (alienShip.size() < MAX_ALIENS && count_aliens < MAX_GENERATE_ALIENS) {
-//                EnemyShip alien = new EnemyShip((int)Math.random() * WIDTH, (int)Math.random()* HEIGHT);
-//                alienShip.add(alien);
-//                pane.getChildren().add(alien.getCharacter());
-//                count_aliens ++;
-//            }
-//        }));
-//        alienGenerator.setCycleCount(Timeline.INDEFINITE);
-//        alienGenerator.play();
-//
-//        //create the alien project, duration.second means the interval of shooting.
-//        List<Projectile> alienProjectiles = new ArrayList<>();
-//        Timeline alienProjectileGenerator = new Timeline(new KeyFrame(Duration.seconds(2), event -> {
-//            for (EnemyShip alien : alienShip) {
-//                Projectile alienProjectile = alien.shootAtTarget(ship);
-//                alienProjectiles.add(alienProjectile);
-//                pane.getChildren().add(alienProjectile.getCharacter());
-//
-//            }
-//        }));
-//        alienProjectileGenerator.setCycleCount(Timeline.INDEFINITE);
-//        alienProjectileGenerator.play();
+        alienGenerator.setCycleCount(Timeline.INDEFINITE);
+        alienGenerator.play();
 
 
 
         List<Asteroid> asteroids = new ArrayList<>();
-        double l=0.01;
+        double l =0.1;
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd= new Random();
             double rnd_1= Math.random()*10+30;
-            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),rnd_1,l);
+            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), rnd_1, l);
             asteroids.add(asteroid);
         }
         double scale=0.5;
@@ -132,7 +121,7 @@ public class GameWindow{
 //                    //get Children method to add a shape
 //                    ship.character.setTranslateX((double) WIDTH / 2);
 //                    ship.character.setTranslateY(500);
-//                    while (!isPositionSafe(WIDTH / 2, 500, ship, asteroids, shoots, alienShip , 100));
+//                    while (!isPositionSafe(WIDTH / 2, 500, ship, asteroids, shoots, alienShip[0], 100));
 //                    text2.setText("Current HP: " + HP);
 //                }else
 //                {
@@ -210,7 +199,7 @@ public class GameWindow{
                 }
 
                 ship.move();
-//                alienShip.move();
+                alienShip.move();
                 asteroids.forEach(asteroid -> asteroid.move());
 
                 /*
@@ -270,7 +259,7 @@ public class GameWindow{
                         level.set(level.get() + 1);
                         text1.setText("Current level: " + level);
                         asteroids.forEach(asteroid -> {
-                            asteroid.move_speed+=(0.01 * level.get());
+                            asteroid.move_speed+= (0.01 * level.get());
                         });
                     }
                     text.setText("Current Points: " + points);
@@ -370,14 +359,14 @@ public class GameWindow{
                                 gameOverPane.getChildren().add(gameOverContainer);
 
 //                                 Animate the pane by changing its opacity from 0 to 1 and back to 0 repeatedly
-                                Timeline animation = new Timeline(
-                                        new KeyFrame(Duration.seconds(0), event -> gameOverPane.setOpacity(0.0)),
-                                        new KeyFrame(Duration.seconds(0.5), event -> gameOverPane.setOpacity(1.0)),
-                                        new KeyFrame(Duration.seconds(1), event -> gameOverPane.setOpacity(0.0))
-                                );
-
-                                animation.setCycleCount(3);
-                                animation.play();
+//                                Timeline animation = new Timeline(
+//                                        new KeyFrame(Duration.seconds(0), event -> gameOverPane.setOpacity(0.0)),
+//                                        new KeyFrame(Duration.seconds(0.5), event -> gameOverPane.setOpacity(1.0)),
+//                                        new KeyFrame(Duration.seconds(1), event -> gameOverPane.setOpacity(0.0))
+//                                );
+//
+//                                animation.setCycleCount(3);
+//                                animation.play();
 
                                 // Add the game over pane to the root pane
                                 pane.getChildren().add(gameOverPane);
@@ -411,30 +400,30 @@ public class GameWindow{
     }
 
     //Determine if the location is safe
-//    public boolean isPositionSafe(double x, double y, PlayerShip player, List<Asteroid> asteroids, List<Projectile> projectiles, List<EnemyShip> aliens, double safeDistance) {
-//        Point2D newPosition = new Point2D(x, y);
-//
-//        // Check for collisions with asteroids
-//        for (Asteroid asteroid : asteroids) {
-//            if (newPosition.distance(asteroid.getCharacter().getTranslateX(), asteroid.getCharacter().getTranslateY()) < safeDistance) {
-//                return false;
-//            }
-//        }
-//
-//        // Check for collisions with projectiles
-//        for (Projectile projectile : projectiles) {
-//            if (newPosition.distance(projectile.getCharacter().getTranslateX(), projectile.getCharacter().getTranslateY()) < safeDistance) {
-//                return false;
-//            }
-//        }
-//
-//        // Check for collisions with alien ships
-//        for (EnemyShip  alien : aliens) {
-//            if (newPosition.distance(alien.getCharacter().getTranslateX(), alien.getCharacter().getTranslateY()) < safeDistance) {
-//                return false;
-//            }
-//        }
-//
-//        return true;
-//    }
+    public boolean isPositionSafe(double x, double y, PlayerShip player, List<Asteroid> asteroids, List<Projectile> projectiles, List<EnemyShip> aliens, double safeDistance) {
+        Point2D newPosition = new Point2D(x, y);
+
+        // Check for collisions with asteroids
+        for (Asteroid asteroid : asteroids) {
+            if (newPosition.distance(asteroid.getCharacter().getTranslateX(), asteroid.getCharacter().getTranslateY()) < safeDistance) {
+                return false;
+            }
+        }
+
+        // Check for collisions with projectiles
+        for (Projectile projectile : projectiles) {
+            if (newPosition.distance(projectile.getCharacter().getTranslateX(), projectile.getCharacter().getTranslateY()) < safeDistance) {
+                return false;
+            }
+        }
+
+        // Check for collisions with alien ships
+        for (EnemyShip  alien : aliens) {
+            if (newPosition.distance(alien.getCharacter().getTranslateX(), alien.getCharacter().getTranslateY()) < safeDistance) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

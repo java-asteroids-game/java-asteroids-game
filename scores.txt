@@ -21,3 +21,4 @@ Tania	10600
 Tania	9600
 Tania	5700
 Tania	3700
+Tania	1300
