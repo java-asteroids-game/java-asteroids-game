@@ -5,6 +5,7 @@ package com.example.javaproject;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.application.Platform;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -282,6 +283,7 @@ public class GameWindow{
 //                                the below code is not working so we chose to add x/y translations directly to center the game over text
 //                                StackPane.setAlignment(gameOverPane, Pos.CENTER);
 
+                            Platform.runLater(() -> {
                                 // Show a dialogue box asking for the user's name
                                 TextInputDialog dialog = new TextInputDialog();
                                 dialog.setTitle("Enter Your Name");
@@ -294,10 +296,26 @@ public class GameWindow{
                                 if (result.isPresent()) {
                                     userName = result.get();
                                 }
-
-                                //SAVING YOUR POINTS LOCALLY TO FILE FOR HIGH SCORE CALCULATION
                                 scoreManager ScoreManager = new scoreManager();
                                 ScoreManager.appendScoreToFile(userName, points);
+                            });
+
+                                // Show a dialogue box asking for the user's name
+//                                TextInputDialog dialog = new TextInputDialog();
+//                                dialog.setTitle("Enter Your Name");
+//                                dialog.setHeaderText(null);
+//                                dialog.setContentText("Please enter your name:");
+//                                Optional<String> result = dialog.showAndWait();
+//
+//                                // Check if the user entered a name and save it to userName variable
+//                                String userName = "";
+//                                if (result.isPresent()) {
+//                                    userName = result.get();
+//                                }
+//
+//                                //SAVING YOUR POINTS LOCALLY TO FILE FOR HIGH SCORE CALCULATION
+//                                scoreManager ScoreManager = new scoreManager();
+//                                ScoreManager.appendScoreToFile(userName, points);
 
                             }
                         }
