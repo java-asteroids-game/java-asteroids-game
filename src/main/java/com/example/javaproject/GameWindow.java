@@ -5,18 +5,18 @@ package com.example.javaproject;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.application.Platform;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class GameWindow{
     //game window size
@@ -38,7 +38,7 @@ public class GameWindow{
         PlayerShip ship = new PlayerShip(WIDTH/2, HEIGHT/2);
         EnemyShip alienShip = new EnemyShip(alien_rnd.nextInt(WIDTH), alien_rnd.nextInt(HEIGHT));
 
-        //getchildren method to add a shape
+        //get children method to add a shape
         pane.getChildren().add(ship.getCharacter());
         pane.getChildren().add(alienShip.getCharacter());
 
@@ -60,6 +60,7 @@ public class GameWindow{
         AtomicInteger level = new AtomicInteger(1);
         AtomicInteger HP= new AtomicInteger(3);
 
+        ScoreManager scoreManager = new ScoreManager();
 
         List<Asteroid> asteroids = new ArrayList<>();
         double l=0.1;
@@ -170,12 +171,12 @@ public class GameWindow{
                 List<Projectile> destroy_asteroid = shoots.stream().filter(shot -> {
                     List<Asteroid> destroy = asteroids.stream()
                             .filter(asteroids -> asteroids.collide(shot))
-                            .collect(Collectors.toList());
+                            .toList();
                     if (destroy.isEmpty()) {
                         return false;
                     }
                     // Remove destroyed asteroid
-                    destroy.stream().forEach(delete -> {
+                    destroy.forEach(delete -> {
                         asteroids.remove(delete);
                         pane.getChildren().remove(delete.getCharacter());
                         for (int i = 0; i < 2 ; i++) {
@@ -190,7 +191,7 @@ public class GameWindow{
                         // Count Level up
                     });
                     return true;
-                }).collect(Collectors.toList());
+                }).toList();
 
                 // Add points,HP and level
                 destroy_asteroid.forEach(shot -> {
@@ -234,8 +235,8 @@ public class GameWindow{
                     if (ship.collide(asteroid)) {
                         HP.set(HP.get() - 1);
                         if(HP.get()>0) {
-                            //getchildredn method to add a shape
-                            ship.character.setTranslateX(WIDTH / 2);
+                            //get children method to add a shape
+                            ship.character.setTranslateX((double) WIDTH / 2);
                             ship.character.setTranslateY(500);
                             while(asteroid.collide(ship))
                             {
@@ -256,15 +257,53 @@ public class GameWindow{
                                 // Create a black-colored pane to cover the entire screen
                                 StackPane gameOverPane = new StackPane();
                                 gameOverPane.setStyle("-fx-background-color: black;");
-                                gameOverPane.setOpacity(0.0); // Set initial opacity to 0
+//                                gameOverPane.setOpacity(0.0); // Set initial opacity to 0
+
+                                // Create a VBox to hold the label and TextField
+                                VBox gameOverContainer = new VBox();
+                                gameOverContainer.setSpacing(20); // Add some space between label and TextField
+
 
                                 // Create a "Game Over" label
-                                Label gameOverLabel = new Label("Game Over");
-                                gameOverLabel.setStyle("-fx-font-size: 55;");
+                                Label gameOverLabel = new Label("GAME OVER");
+                                gameOverLabel.setStyle("-fx-font-size: 65;");
                                 gameOverLabel.setTextFill(Color.WHITE);
 
+                                // Create a TextField for user input
+                                TextField playerNameField = new TextField();
+                                playerNameField.setPromptText("Enter your name");
+                                playerNameField.setStyle("-fx-font-size: 30; " +
+                                        "-fx-text-fill: white; " +
+                                        "-fx-background-color: black; " +
+                                        "-fx-border-color: transparent; " +
+                                        "-fx-border-width: 0;");
+                                playerNameField.setMaxWidth(300);
+
+                                // Add listener to detect when the user has pressed enter
+                                playerNameField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                                    if (event.getCode() == KeyCode.ENTER) {
+                                        String playerName = playerNameField.getText().trim();
+                                        if (!playerName.isEmpty()) {
+                                            // Call the ScoreManager.appendScore() method
+                                            scoreManager.appendScoreToFile(playerName, points);
+
+                                            // Hide the input box
+                                            playerNameField.setVisible(false);
+
+                                            // Display the list of high scores
+                                            ArrayList<String> highScoreList = scoreManager.outputThreeHighestScores();
+                                            System.out.println(highScoreList);
+
+                                        }
+                                    }
+                                });
+
+
                                 // Add the "Game Over" label to the pane
-                                gameOverPane.getChildren().add(gameOverLabel);
+                                gameOverContainer.getChildren().addAll(gameOverLabel, playerNameField);
+
+                                // Add the VBox to the pane
+                                gameOverPane.getChildren().add(gameOverContainer);
 
                                 // Animate the pane by changing its opacity from 0 to 1 and back to 0 repeatedly
 //                                Timeline animation = new Timeline(
@@ -283,22 +322,22 @@ public class GameWindow{
 //                                the below code is not working so we chose to add x/y translations directly to center the game over text
 //                                StackPane.setAlignment(gameOverPane, Pos.CENTER);
 
-                            Platform.runLater(() -> {
-                                // Show a dialogue box asking for the user's name
-                                TextInputDialog dialog = new TextInputDialog();
-                                dialog.setTitle("Enter Your Name");
-                                dialog.setHeaderText(null);
-                                dialog.setContentText("Please enter your name:");
-                                Optional<String> result = dialog.showAndWait();
-
-                                // Check if the user entered a name and save it to userName variable
-                                String userName = "";
-                                if (result.isPresent()) {
-                                    userName = result.get();
-                                }
-                                scoreManager ScoreManager = new scoreManager();
-                                ScoreManager.appendScoreToFile(userName, points);
-                            });
+//                            Platform.runLater(() -> {
+//                                // Show a dialogue box asking for the user's name
+//                                TextInputDialog dialog = new TextInputDialog();
+//                                dialog.setTitle("Enter Your Name");
+//                                dialog.setHeaderText(null);
+//                                dialog.setContentText("Please enter your name:");
+//                                Optional<String> result = dialog.showAndWait();
+//
+//                                // Check if the user entered a name and save it to userName variable
+//                                String userName = "";
+//                                if (result.isPresent()) {
+//                                    userName = result.get();
+//                                }
+//                                scoreManager ScoreManager = new scoreManager();
+//                                ScoreManager.appendScoreToFile(userName, points);
+//                            });
 
                                 // Show a dialogue box asking for the user's name
 //                                TextInputDialog dialog = new TextInputDialog();

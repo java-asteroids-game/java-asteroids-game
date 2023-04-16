@@ -1,12 +1,11 @@
 package com.example.javaproject;
 
-import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
 public class Projectile extends AbstractGameElement {
 
     public Projectile(int x, int y) {
-        super(new Polygon(1, -1, 1, 1, -1, 1, -1, -1), x, y);
+        super(new CharacterFactory().createBullet(), x, y);
     }
 
 
@@ -17,21 +16,6 @@ public class Projectile extends AbstractGameElement {
         this.getCharacter().setTranslateX(getCharacter().getTranslateX() + changeX * 5);
         this.getCharacter().setTranslateY(this.getCharacter().getTranslateY() + changeY * 5);
 
-//        if (this.character.getTranslateX() < 0) {
-//            this.character.setTranslateX(this.character.getTranslateX() + GameWindow.WIDTH);
-//        }
-//
-//        if (this.character.getTranslateX() > GameWindow.WIDTH) {
-//            this.character.setTranslateX(this.character.getTranslateX() % GameWindow.WIDTH);
-//        }
-//
-//        if (this.character.getTranslateY() < 0) {
-//            this.character.setTranslateY(this.character.getTranslateY() + GameWindow.HEIGHT);
-//        }
-//
-//        if (this.character.getTranslateY() > GameWindow.HEIGHT) {
-//            this.character.setTranslateY(this.character.getTranslateY() % GameWindow.HEIGHT);
-//        }
     }
 
     public boolean collide(AbstractGameElement other) {

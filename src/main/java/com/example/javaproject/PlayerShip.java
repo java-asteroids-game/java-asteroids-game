@@ -1,33 +1,18 @@
 package com.example.javaproject;
 
-import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
 public class PlayerShip extends AbstractGameElement {
 
     public PlayerShip(int x, int y) {
-        super(new Polygon(-5, -5, 10, 0, -5, 5), x, y);
+        super(new CharacterFactory().createShip(), x, y);
     }
     @Override
     public void move() {
         this.character.setTranslateX(this.character.getTranslateX() + this.movement.getX());
         this.character.setTranslateY(this.character.getTranslateY() + this.movement.getY());
 
-        if (this.character.getTranslateX() < 0) {
-            this.character.setTranslateX(this.character.getTranslateX() + GameWindow.WIDTH);
-        }
-
-        if (this.character.getTranslateX() > GameWindow.WIDTH) {
-            this.character.setTranslateX(this.character.getTranslateX() % GameWindow.WIDTH);
-        }
-
-        if (this.character.getTranslateY() < 0) {
-            this.character.setTranslateY(this.character.getTranslateY() + GameWindow.HEIGHT);
-        }
-
-        if (this.character.getTranslateY() > GameWindow.HEIGHT) {
-            this.character.setTranslateY(this.character.getTranslateY() % GameWindow.HEIGHT);
-        }
+        wrapScreen();
 
     }
 

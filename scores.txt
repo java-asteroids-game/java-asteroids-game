@@ -1,5 +1,20 @@
-Ajwad 500
-Conor 600
-James 900
-Tania 400
-Yuntao 700Dan 0
+Ajwad	500
+Conor	600
+James	900
+Tania	400
+Yuntao	700
+Dan	0
+Tania	0
+Tania	0
+Tania	0
+Tania	0
+Tania	0
+Tania	0
+Tania	0
+Tania	0
+Tania	0
+Tania	0
+Tania	0
+Tania	16400
+Tania	0
+Tania	10600

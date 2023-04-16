@@ -28,7 +28,7 @@ public class ScoreWindow {
         pane.getChildren().add(text0);
 
         //displaying score
-        scoreManager ScoreManager = new scoreManager();
+        ScoreManager ScoreManager = new ScoreManager();
         ArrayList<String> highscore = ScoreManager.outputThreeHighestScores(); //this will output the 3 highest scores, we just need an empty pane
 
         int y = 130; // y-coordinate for the Text objects
