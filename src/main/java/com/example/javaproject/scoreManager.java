@@ -3,6 +3,7 @@ package com.example.javaproject;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class scoreManager {
         private int score;
@@ -18,7 +19,7 @@ public class scoreManager {
 //        }
 
         // Method to append score to a local file
-        public void appendScoreToFile(int score) {
+        public void appendScoreToFile(AtomicInteger  score) {
             String fileName = "scores.txt"; // Update the file name
             try {
                 FileWriter fileWriter = new FileWriter(fileName, true);
@@ -32,24 +33,30 @@ public class scoreManager {
         }
 
         // Method to read file and output three highest scores
-        public void outputThreeHighestScores(String fileName) {
+        public ArrayList<String> outputThreeHighestScores() {
+            ArrayList<String> highscorelist = new ArrayList<>();
             try {
-                FileReader fileReader = new FileReader(fileName);
+                FileReader fileReader = new FileReader("scores.txt");
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
                 ArrayList<Integer> scores = new ArrayList<>();
                 String line;
+
                 while ((line = bufferedReader.readLine()) != null) {
                     scores.add(Integer.parseInt(line));
                 }
                 bufferedReader.close();
+
+                //making a list of the three highest scores
                 Collections.sort(scores, Collections.reverseOrder());
-                System.out.println("Three highest scores:");
                 for (int i = 0; i < 3 && i < scores.size(); i++) {
-                    System.out.println(scores.get(i));
+                    String highscore = (i + 1) + "- " + scores.get(i);
+                    highscorelist.add(highscore);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return highscorelist;
         }
+
     }
 

@@ -3,6 +3,7 @@ package com.example.javaproject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 
 public class IndexController {
 
@@ -13,15 +14,16 @@ public class IndexController {
     private Label highscore;
 
     @FXML
-    void mouseClickScore(MouseEvent event) {
-//        Pane.getInstance().scorelist();
-    }
-
-    @FXML
     void mouseClickStart(MouseEvent event) {
         Pane.getInstance().gameStart();
     }
+    @FXML
+    void mouseClickScore(MouseEvent event) {
+        Stage stage = new Stage(); // Create a new Stage instance
+        Pane.getInstance().scorelist(stage); // Pass the Stage instance to the scorelist() method
 
+//        Pane.getInstance().scorelist();
+    }
     @FXML
     void mouseEnterScore(MouseEvent event) {
         highscore.setOpacity(0.7);

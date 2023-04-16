@@ -2,22 +2,19 @@ package com.example.javaproject;
 
 // Imports required packages
 
+import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.geometry.Pos;
 import javafx.util.Duration;
-
-
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -254,6 +251,11 @@ public class GameWindow{
                             text2.setText("GameOver");
 
                             if (HP.get() == 0){
+                                //SAVING YOUR POINTS LOCALLY TO FILE FOR HIGH SCORE CALCULATION
+                                scoreManager ScoreManager = new scoreManager();
+                                ScoreManager.appendScoreToFile(points);
+
+                                //DISPLAYING GAME OVER (suggestion: change this to it's own method?)
                                 // Clear all game elements from the root pane
                                 pane.getChildren().clear();
 
@@ -286,8 +288,7 @@ public class GameWindow{
                                 gameOverPane.setTranslateY((pane.getHeight() - gameOverPane.getHeight()) / 2.5);
 
 //                                the below code is not working so we chose to add x/y translations directly to center the game over text
-                                StackPane.setAlignment(gameOverPane, Pos.CENTER);
-
+//                                StackPane.setAlignment(gameOverPane, Pos.CENTER);
 
 
 //                                the below code pops up a new pane with the game over text:

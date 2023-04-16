@@ -12,8 +12,7 @@ public class Pane {
     private static Pane instance = new Pane();
     private Stage stage;
     private GameWindow game = new GameWindow();
-//    private ScoreList scorelist = new ScoreList();
-
+    private ScoreWindow scoreWindow = new ScoreWindow();
     private Pane(){}
 
     public static Pane getInstance(){
@@ -39,7 +38,9 @@ public class Pane {
         game.load(stage,3);
     }
 
-//    public void scorelist() {
-//        scorelist.load(stage);
-//    }
+    public void scorelist(Stage stage) {
+        scoreWindow.load(stage);
+    }
 }
+
+    //we can add a gameOver method here to call for further abstraction
