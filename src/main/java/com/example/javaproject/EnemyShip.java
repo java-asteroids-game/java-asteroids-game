@@ -51,6 +51,10 @@ public class EnemyShip extends AbstractGameElement {
         bounceOffScreen();
     }
 
+//    public Projectile shootAtTarget(PlayerShip target){
+//        return
+//    }
+
 
 
     public boolean collide(AbstractGameElement other) {

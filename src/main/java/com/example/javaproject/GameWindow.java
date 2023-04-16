@@ -17,13 +17,14 @@ import javafx.stage.Stage;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class GameWindow{
     //game window size
     public static final int WIDTH = 960;
     public static final int HEIGHT = 600;
     int framesSinceLastShot = 0;
+
+    ScoreManager scoreManager = new ScoreManager();
 
 
     public void load(Stage stage, int numAsteroids){
@@ -39,7 +40,7 @@ public class GameWindow{
         PlayerShip ship = new PlayerShip(WIDTH/2, HEIGHT/2);
         EnemyShip alienShip = new EnemyShip(alien_rnd.nextInt(WIDTH), alien_rnd.nextInt(HEIGHT));
 
-        //get children method to add a shape
+        //getchildren method to add a shape
         pane.getChildren().add(ship.getCharacter());
         pane.getChildren().add(alienShip.getCharacter());
 
@@ -61,7 +62,6 @@ public class GameWindow{
         AtomicInteger level = new AtomicInteger(1);
         AtomicInteger HP= new AtomicInteger(3);
 
-        ScoreManager scoreManager = new ScoreManager();
 
         List<Asteroid> asteroids = new ArrayList<>();
         double l=0.01;
@@ -292,8 +292,8 @@ public class GameWindow{
                                             playerNameField.setVisible(false);
 
                                             // Display the list of high scores
-                                            ArrayList<String> highScoreList = scoreManager.outputThreeHighestScores();
-                                            System.out.println(highScoreList);
+                                            Stage stage = new Stage(); // Create a new Stage instance
+                                            com.example.javaproject.Pane.getInstance().scorelist(stage);
 
                                         }
                                     }
