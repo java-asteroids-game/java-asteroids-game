@@ -1,8 +1,5 @@
-400
-0
-1300
-1000
-300
-0
-0
-Ajwad 0
+Ajwad 500
+Conor 600
+James 900
+Tania 400
+Yuntao 700
