@@ -9,6 +9,15 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.geometry.Pos;
+import javafx.util.Duration;
+
+
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -244,6 +253,55 @@ public class GameWindow{
                             stop();
                             text2.setText("GameOver");
 
+                            if (HP.get() == 0){
+                                // Clear all game elements from the root pane
+                                pane.getChildren().clear();
+
+                                // Create a black-colored pane to cover the entire screen
+                                StackPane gameOverPane = new StackPane();
+                                gameOverPane.setStyle("-fx-background-color: black;");
+                                gameOverPane.setOpacity(0.0); // Set initial opacity to 0
+
+                                // Create a "Game Over" label
+                                Label gameOverLabel = new Label("Game Over");
+                                gameOverLabel.setStyle("-fx-font-size: 55;");
+                                gameOverLabel.setTextFill(Color.WHITE);
+
+                                // Add the "Game Over" label to the pane
+                                gameOverPane.getChildren().add(gameOverLabel);
+
+                                // Animate the pane by changing its opacity from 0 to 1 and back to 0 repeatedly
+                                Timeline animation = new Timeline(
+                                        new KeyFrame(Duration.seconds(0), event -> gameOverPane.setOpacity(0.0)),
+                                        new KeyFrame(Duration.seconds(0.5), event -> gameOverPane.setOpacity(1.0)),
+                                        new KeyFrame(Duration.seconds(1), event -> gameOverPane.setOpacity(0.0))
+                                );
+
+                                animation.setCycleCount(Animation.INDEFINITE);
+                                animation.play();
+
+                                // Add the game over pane to the root pane
+                                pane.getChildren().add(gameOverPane);
+                                gameOverPane.setTranslateX((pane.getWidth() - gameOverPane.getWidth()) / 2.8);
+                                gameOverPane.setTranslateY((pane.getHeight() - gameOverPane.getHeight()) / 2.5);
+
+//                                the below code is not working so we chose to add x/y translations directly to center the game over text
+                                StackPane.setAlignment(gameOverPane, Pos.CENTER);
+
+
+
+//                                the below code pops up a new pane with the game over text:
+////                                Stage stage = new Stage();
+//                                StackPane root = new StackPane();
+//                                Label label = new Label("Game Over");
+//                                label.setFont(new Font("Arial", 36));
+//                                label.setTextFill(Color.WHITE);
+//                                root.getChildren().add(label);
+//                                root.setStyle("-fx-background-color: black;");
+//                                Scene scene = new Scene(root, 400, 300);
+//                                stage.setScene(scene);
+//                                stage.show();
+                            }
                         }
                     }
                 });
