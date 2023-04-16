@@ -23,8 +23,16 @@
                 <Bloom />
             </effect>
         </Label>
+        <Label fx:id="controls" layoutX="386.0" layoutY="505.0" onMouseClicked="#mouseClickControls" onMouseEntered="#mouseEnterControls" onMouseExited="#mouseExitControls" prefHeight="62.0" prefWidth="248.0" text="CONTROLS" textFill="WHITE">
+            <font>
+                <Font name="Arial" size="38.0" />
+            </font>
+            <effect>
+                <Bloom />
+            </effect>
+        </Label>
         <Label layoutX="465.0" layoutY="124.0" textFill="WHITE" />
-        <Label layoutX="322.0" layoutY="115.0" text="Asteroids Game" textFill="WHITE">
+        <Label layoutX="305.0" layoutY="115.0" text="Asteroids Game" textFill="WHITE">
             <font>
                 <Font size="52.0" />
             </font>

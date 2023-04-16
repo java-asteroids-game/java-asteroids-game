@@ -14,6 +14,9 @@ public class IndexController {
     private Label highscore;
 
     @FXML
+    private Label controls;
+
+    @FXML
     void mouseClickStart(MouseEvent event) {
         Pane.getInstance().gameStart();
     }
@@ -44,4 +47,20 @@ public class IndexController {
         startgame.setOpacity(1);
     }
 
+
+    @FXML
+    void mouseEnterControls(MouseEvent event) {
+        controls.setOpacity(0.7);
+    }
+
+    @FXML
+    void mouseExitControls(MouseEvent event) {
+        controls.setOpacity(1);
+    }
+
+    @FXML
+    void mouseClickControls(MouseEvent event) {
+        Stage stage1 = new Stage(); // Create a new Stage instance
+        Pane.getInstance().showControls(stage1); // Pass the Stage instance to the showControls() method
+    }
 }

@@ -41,6 +41,10 @@ public class Pane {
     public void scorelist(Stage stage) {
         scoreWindow.load(stage);
     }
+
+    public void showControls(Stage stage) {
+        Controls.load(stage);
+    }
 }
 
     //we can add a gameOver method here to call for further abstraction
