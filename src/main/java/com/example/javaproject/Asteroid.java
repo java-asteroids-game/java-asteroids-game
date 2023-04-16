@@ -53,7 +53,7 @@ public class Asteroid<move_speed> extends AbstractGameElement {
         return this.size;
     }
     public double Move_speed_up(){
-        this.move_speed+=0.1;
+        this.move_speed=0.05;
         return this.move_speed;
     }
 

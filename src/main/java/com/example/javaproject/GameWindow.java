@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class GameWindow{
     //game window size
@@ -63,7 +64,7 @@ public class GameWindow{
         ScoreManager scoreManager = new ScoreManager();
 
         List<Asteroid> asteroids = new ArrayList<>();
-        double l=0.1;
+        double l=0.01;
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd= new Random();
             double rnd_1= Math.random()*10+30;
@@ -206,7 +207,7 @@ public class GameWindow{
                         level.set(level.get() + 1);
                         text1.setText("Current level: " + level);
                         asteroids.forEach(asteroid -> {
-                            asteroid.move_speed+=(0.1 * level.get());
+                            asteroid.move_speed+=(0.01 * level.get());
                         });
                     }
                     text.setText("Current Points: " + points);
