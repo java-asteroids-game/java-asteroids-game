@@ -1,16 +1,16 @@
+
 package com.example.javaproject;
 
 import java.io.*;
 import java.util.*;
 
-public class scores {
-    public class ScoreManager {
+public class scoreManager {
         private int score;
 
         // Score Constructor
-        public ScoreManager() {
-            score = 0;
-        }
+//        public ScoreManager() {
+//            score = 0;
+//        }
 
         // Method to increment score (done in-line)
 //        public void incrementScore() {
@@ -18,7 +18,8 @@ public class scores {
 //        }
 
         // Method to append score to a local file
-        public void appendScoreToFile(String fileName) {
+        public void appendScoreToFile(int score) {
+            String fileName = "scores.txt"; // Update the file name
             try {
                 FileWriter fileWriter = new FileWriter(fileName, true);
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
@@ -52,4 +53,3 @@ public class scores {
         }
     }
 
-}
