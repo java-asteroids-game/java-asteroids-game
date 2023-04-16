@@ -22,7 +22,7 @@ public class ScoreWindow {
         pane.setPrefSize(WIDTH, HEIGHT);
         pane.setStyle("-fx-background-color: black");
 
-        Text text0 = new Text(190, 80, "High Score");
+        Text text0 = new Text(170, 80, "High Score");
         text0.setFill(Color.WHITE);
         text0.setStyle("-fx-font: 30 arial;");
         pane.getChildren().add(text0);
@@ -31,9 +31,10 @@ public class ScoreWindow {
         scoreManager ScoreManager = new scoreManager();
         ArrayList<String> highscore = ScoreManager.outputThreeHighestScores(); //this will output the 3 highest scores, we just need an empty pane
 
-        int y = 150; // y-coordinate for the Text objects
+        int y = 130; // y-coordinate for the Text objects
         for (String line : highscore) {
-            Text text1 = new Text(210, y, line);
+            y += 5;
+            Text text1 = new Text(170, y, line);
             text1.setFill(Color.WHITE);
             text1.setStyle("-fx-font: 20 arial;");
             pane.getChildren().add(text1);

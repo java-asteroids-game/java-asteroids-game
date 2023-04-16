@@ -8,16 +8,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class scoreManager {
         private int score;
 
-        // Score Constructor
-//        public ScoreManager() {
-//            score = 0;
-//        }
-
-        // Method to increment score (done in-line)
-//        public void incrementScore() {
-//            score += 10; //call this whenever an asteroid is hit, multiple methods can be created for different asteroid sizes
-//        }
-
         // Method to append score to a local file
         public void appendScoreToFile(String name, AtomicInteger  score) {
             String fileName = "scores.txt"; // Update the file name
@@ -35,23 +25,37 @@ public class scoreManager {
         // Method to read file and output three highest scores
         public ArrayList<String> outputThreeHighestScores() {
             ArrayList<String> highscorelist = new ArrayList<>();
+            HashMap<String, Integer> scoresMap = new HashMap<>();
+
             try {
                 FileReader fileReader = new FileReader("scores.txt");
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
+                ArrayList<String> names = new ArrayList<>();
                 ArrayList<Integer> scores = new ArrayList<>();
                 String line;
 
                 while ((line = bufferedReader.readLine()) != null) {
-                    scores.add(Integer.parseInt(line));
+                    String[] parts = line.split("\\s+"); // Split the line by whitespace
+                    if (parts.length == 2) { // Ensure there are two parts (name and score)
+                        String name = parts[0]; // First part is the name
+                        int score = Integer.parseInt(parts[1]); // Second part is the score
+//                        names.add(name);
+//                        scores.add(score);
+                        scoresMap.put(name, score);
+                    }
                 }
                 bufferedReader.close();
 
-                //making a list of the three highest scores
-                Collections.sort(scores, Collections.reverseOrder());
-                for (int i = 0; i < 4 && i < scores.size(); i++) {
-                    String highscore = (i + 1) + "- " + scores.get(i);
+                // Sort the HashMap by highest scores
+                List<Map.Entry<String, Integer>> sortedEntries = new ArrayList<>(scoresMap.entrySet());
+                Collections.sort(sortedEntries, (a, b) -> b.getValue().compareTo(a.getValue()));
+
+                // Print the sorted HashMap
+                for (int i = 0; i < 3 && i < sortedEntries.size(); i++) {
+                    String highscore = (i + 1) + "- " + sortedEntries.get(i).getKey() + " - " + sortedEntries.get(i).getValue();
                     highscorelist.add(highscore);
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
