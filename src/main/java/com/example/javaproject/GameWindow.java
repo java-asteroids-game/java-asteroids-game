@@ -62,7 +62,7 @@ public class GameWindow{
 
 
         List<Asteroid> asteroids = new ArrayList<>();
-        double l=0.1;
+        double l=0.01;
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd= new Random();
             double rnd_1= Math.random()*10+30;
@@ -205,7 +205,7 @@ public class GameWindow{
                         level.set(level.get() + 1);
                         text1.setText("Current level: " + level);
                         asteroids.forEach(asteroid -> {
-                            asteroid.move_speed+=(0.1 * level.get());
+                            asteroid.move_speed+=(0.01 * level.get());
                         });
                     }
                     text.setText("Current Points: " + points);
@@ -234,7 +234,7 @@ public class GameWindow{
                     if (ship.collide(asteroid)) {
                         HP.set(HP.get() - 1);
                         if(HP.get()>0) {
-                            //getchildredn method to add a shape
+                            //getchildren method to add a shape
                             ship.character.setTranslateX(WIDTH / 2);
                             ship.character.setTranslateY(500);
                             while(asteroid.collide(ship))
