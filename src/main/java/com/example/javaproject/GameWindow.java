@@ -2,12 +2,13 @@ package com.example.javaproject;
 
 // Imports required packages
 
-import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
+import javafx.animation.PauseTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -251,10 +252,6 @@ public class GameWindow{
                             text2.setText("GameOver");
 
                             if (HP.get() == 0){
-                                //SAVING YOUR POINTS LOCALLY TO FILE FOR HIGH SCORE CALCULATION
-                                scoreManager ScoreManager = new scoreManager();
-                                ScoreManager.appendScoreToFile(points);
-
                                 //DISPLAYING GAME OVER (suggestion: change this to it's own method?)
                                 // Clear all game elements from the root pane
                                 pane.getChildren().clear();
@@ -279,29 +276,38 @@ public class GameWindow{
                                         new KeyFrame(Duration.seconds(1), event -> gameOverPane.setOpacity(0.0))
                                 );
 
-                                animation.setCycleCount(Animation.INDEFINITE);
+                                animation.setCycleCount(3);
                                 animation.play();
 
                                 // Add the game over pane to the root pane
                                 pane.getChildren().add(gameOverPane);
                                 gameOverPane.setTranslateX((pane.getWidth() - gameOverPane.getWidth()) / 2.8);
                                 gameOverPane.setTranslateY((pane.getHeight() - gameOverPane.getHeight()) / 2.5);
-
 //                                the below code is not working so we chose to add x/y translations directly to center the game over text
 //                                StackPane.setAlignment(gameOverPane, Pos.CENTER);
 
+                                // Create a pause transition to wait for 3 seconds before showing the name input dialog
+                                PauseTransition pause = new PauseTransition(Duration.seconds(3));
+                                pause.setOnFinished(event -> {
+                                    // Create a dialog to ask for the user's name
+                                    TextInputDialog dialog = new TextInputDialog();
+                                    dialog.setTitle("Enter Your Name");
+                                    dialog.setHeaderText("Game Over");
+                                    dialog.setContentText("Enter your name:");
 
-//                                the below code pops up a new pane with the game over text:
-////                                Stage stage = new Stage();
-//                                StackPane root = new StackPane();
-//                                Label label = new Label("Game Over");
-//                                label.setFont(new Font("Arial", 36));
-//                                label.setTextFill(Color.WHITE);
-//                                root.getChildren().add(label);
-//                                root.setStyle("-fx-background-color: black;");
-//                                Scene scene = new Scene(root, 400, 300);
-//                                stage.setScene(scene);
-//                                stage.show();
+                                    // Show the dialog and retrieve the user's name and append score to file
+                                    dialog.showAndWait().ifPresent(name -> {
+                                        scoreManager ScoreManager = new scoreManager();
+                                        ScoreManager.appendScoreToFile(name, points);
+                                    });
+                                });
+                                pause.play();
+
+                                //SAVING YOUR POINTS LOCALLY TO FILE FOR HIGH SCORE CALCULATION
+                                // Store the name to a variable or perform other actions with it
+//                                scoreManager ScoreManager = new scoreManager();
+//                                ScoreManager.appendScoreToFile(userName, points);
+
                             }
                         }
                     }

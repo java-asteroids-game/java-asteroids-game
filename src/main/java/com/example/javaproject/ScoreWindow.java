@@ -27,7 +27,6 @@ public class ScoreWindow {
         text0.setStyle("-fx-font: 30 arial;");
         pane.getChildren().add(text0);
 
-
         //displaying score
         scoreManager ScoreManager = new scoreManager();
         ArrayList<String> highscore = ScoreManager.outputThreeHighestScores(); //this will output the 3 highest scores, we just need an empty pane

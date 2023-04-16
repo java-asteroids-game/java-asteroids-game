@@ -19,13 +19,13 @@ public class scoreManager {
 //        }
 
         // Method to append score to a local file
-        public void appendScoreToFile(AtomicInteger  score) {
+        public void appendScoreToFile(String name, AtomicInteger  score) {
             String fileName = "scores.txt"; // Update the file name
             try {
                 FileWriter fileWriter = new FileWriter(fileName, true);
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
                 PrintWriter printWriter = new PrintWriter(bufferedWriter);
-                printWriter.println(score);
+                printWriter.println(name + " " + score);
                 printWriter.close();
             } catch (IOException e) {
                 e.printStackTrace();
