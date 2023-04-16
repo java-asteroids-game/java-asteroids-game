@@ -22,7 +22,7 @@ public class Pane {
     public void scene(Stage stage){
         AnchorPane root = new AnchorPane();
         Scene scene = new Scene(root, WIDTH, HEIGHT);
-        stage.setTitle("Asteroid");
+        stage.setTitle("Asteroids Game");
         stage.setResizable(false);
         stage.setScene(scene);
         this.stage = stage;

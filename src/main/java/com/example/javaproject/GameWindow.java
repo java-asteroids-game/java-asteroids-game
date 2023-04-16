@@ -26,6 +26,9 @@ public class GameWindow{
     //game window size
     public static final int WIDTH = 960;
     public static final int HEIGHT = 600;
+    public static int MAX_ALIENS = 2;
+    public int MAX_GENERATE_ALIENS = 3;
+    int count_aliens = 0;
     int framesSinceLastShot = 0;
 
     ScoreManager scoreManager = new ScoreManager();
@@ -43,16 +46,16 @@ public class GameWindow{
         //get children method to add a shape
         pane.getChildren().add(ship.getCharacter());
 
-        // Show current points ,current level, and current HP
-        Text text = new Text(10, 20, "Current Points: 0");
-        Text text1 = new Text(10,40,"Current Level: 1");
-        Text text2 = new Text(10,60,"Current HP: 3");
+        // Show points ,level, and HP
+        Text text = new Text(30, 40, "Points: 0");
+        Text text1 = new Text(30,80,"Level: 1");
+        Text text2 = new Text(850,40,"Lives: 3");
         text.setFill(Color.WHITE);
         text1.setFill(Color.WHITE);
         text2.setFill(Color.WHITE);
-        text.setStyle("-fx-font: 20 arial;");
-        text1.setStyle("-fx-font: 20 arial;");
-        text2.setStyle("-fx-font: 20 arial;");
+        text.setStyle("-fx-font-family: 'Bank Gothic'; -fx-font-size: 20px;");
+        text1.setStyle("-fx-font-family: 'Bank Gothic'; -fx-font-size: 20px;");
+        text2.setStyle("-fx-font-family: 'Bank Gothic'; -fx-font-size: 20px;");
         pane.getChildren().add(text);
         pane.getChildren().add(text1);
         pane.getChildren().add(text2);
@@ -121,8 +124,8 @@ public class GameWindow{
 //                    //get Children method to add a shape
 //                    ship.character.setTranslateX((double) WIDTH / 2);
 //                    ship.character.setTranslateY(500);
-//                    while (!isPositionSafe(WIDTH / 2, 500, ship, asteroids, shoots, alienShip[0], 100));
-//                    text2.setText("Current HP: " + HP);
+//                    while (!isPositionSafe(WIDTH / 2, 500, ship, asteroids, shoots, alienShip , 100));
+//                    text2.setText("HP: " + HP);
 //                }else
 //                {
 //                    text2.setText("GameOver");
@@ -254,15 +257,15 @@ public class GameWindow{
                     if(points.get()%1000==0){
 
                         HP.set(HP.get() + 1);
-                        text2.setText("Current HP: " + HP);
+                        text2.setText("Lives: " + HP);
 
                         level.set(level.get() + 1);
-                        text1.setText("Current level: " + level);
+                        text1.setText("Level: " + level);
                         asteroids.forEach(asteroid -> {
                             asteroid.move_speed+= (0.01 * level.get());
                         });
                     }
-                    text.setText("Current Points: " + points);
+                    text.setText("Points: " + points);
 
                 });
 
@@ -277,7 +280,7 @@ public class GameWindow{
                         pane.getChildren().add(asteroid.getCharacter());
                     }
                     level.incrementAndGet();
-                    text1.setText("Current Level: " + level.get());
+                    text1.setText("Level: " + level.get());
                 }
 
                 // Hyper jumps and random reborn position
@@ -296,7 +299,7 @@ public class GameWindow{
                                 ship.character.setTranslateX(Math.random()*WIDTH);
                                 ship.character.setTranslateY(Math.random()*HEIGHT);
                             }
-                            text2.setText("Current HP: " + HP);
+                            text2.setText("Lives: " + HP);
                         }else
                         {
                             stop();
@@ -359,14 +362,14 @@ public class GameWindow{
                                 gameOverPane.getChildren().add(gameOverContainer);
 
 //                                 Animate the pane by changing its opacity from 0 to 1 and back to 0 repeatedly
-//                                Timeline animation = new Timeline(
-//                                        new KeyFrame(Duration.seconds(0), event -> gameOverPane.setOpacity(0.0)),
-//                                        new KeyFrame(Duration.seconds(0.5), event -> gameOverPane.setOpacity(1.0)),
-//                                        new KeyFrame(Duration.seconds(1), event -> gameOverPane.setOpacity(0.0))
-//                                );
-//
-//                                animation.setCycleCount(3);
-//                                animation.play();
+                                Timeline animation = new Timeline(
+                                        new KeyFrame(Duration.seconds(0), event -> gameOverPane.setOpacity(0.0)),
+                                        new KeyFrame(Duration.seconds(0.5), event -> gameOverPane.setOpacity(1.0)),
+                                        new KeyFrame(Duration.seconds(1), event -> gameOverPane.setOpacity(0.0))
+                                );
+
+                                animation.setCycleCount(3);
+                                animation.play();
 
                                 // Add the game over pane to the root pane
                                 pane.getChildren().add(gameOverPane);
