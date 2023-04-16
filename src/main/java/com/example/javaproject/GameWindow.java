@@ -3,9 +3,6 @@ package com.example.javaproject;
 // Imports required packages
 
 import javafx.animation.AnimationTimer;
-import javafx.animation.PauseTransition;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
@@ -15,7 +12,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -270,14 +266,14 @@ public class GameWindow{
                                 gameOverPane.getChildren().add(gameOverLabel);
 
                                 // Animate the pane by changing its opacity from 0 to 1 and back to 0 repeatedly
-                                Timeline animation = new Timeline(
-                                        new KeyFrame(Duration.seconds(0), event -> gameOverPane.setOpacity(0.0)),
-                                        new KeyFrame(Duration.seconds(0.5), event -> gameOverPane.setOpacity(1.0)),
-                                        new KeyFrame(Duration.seconds(1), event -> gameOverPane.setOpacity(0.0))
-                                );
-
-                                animation.setCycleCount(3);
-                                animation.play();
+//                                Timeline animation = new Timeline(
+//                                        new KeyFrame(Duration.seconds(0), event -> gameOverPane.setOpacity(0.0)),
+//                                        new KeyFrame(Duration.seconds(0.5), event -> gameOverPane.setOpacity(1.0)),
+//                                        new KeyFrame(Duration.seconds(1), event -> gameOverPane.setOpacity(0.0))
+//                                );
+//
+//                                animation.setCycleCount(3);
+//                                animation.play();
 
                                 // Add the game over pane to the root pane
                                 pane.getChildren().add(gameOverPane);
@@ -286,27 +282,22 @@ public class GameWindow{
 //                                the below code is not working so we chose to add x/y translations directly to center the game over text
 //                                StackPane.setAlignment(gameOverPane, Pos.CENTER);
 
-                                // Create a pause transition to wait for 3 seconds before showing the name input dialog
-                                PauseTransition pause = new PauseTransition(Duration.seconds(3));
-                                pause.setOnFinished(event -> {
-                                    // Create a dialog to ask for the user's name
-                                    TextInputDialog dialog = new TextInputDialog();
-                                    dialog.setTitle("Enter Your Name");
-                                    dialog.setHeaderText("Game Over");
-                                    dialog.setContentText("Enter your name:");
+                                // Show a dialogue box asking for the user's name
+                                TextInputDialog dialog = new TextInputDialog();
+                                dialog.setTitle("Enter Your Name");
+                                dialog.setHeaderText(null);
+                                dialog.setContentText("Please enter your name:");
+                                Optional<String> result = dialog.showAndWait();
 
-                                    // Show the dialog and retrieve the user's name and append score to file
-                                    dialog.showAndWait().ifPresent(name -> {
-                                        scoreManager ScoreManager = new scoreManager();
-                                        ScoreManager.appendScoreToFile(name, points);
-                                    });
-                                });
-                                pause.play();
+                                // Check if the user entered a name and save it to userName variable
+                                String userName = "";
+                                if (result.isPresent()) {
+                                    userName = result.get();
+                                }
 
                                 //SAVING YOUR POINTS LOCALLY TO FILE FOR HIGH SCORE CALCULATION
-                                // Store the name to a variable or perform other actions with it
-//                                scoreManager ScoreManager = new scoreManager();
-//                                ScoreManager.appendScoreToFile(userName, points);
+                                scoreManager ScoreManager = new scoreManager();
+                                ScoreManager.appendScoreToFile(userName, points);
 
                             }
                         }
