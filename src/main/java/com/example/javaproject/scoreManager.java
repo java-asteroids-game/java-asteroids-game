@@ -48,7 +48,7 @@ public class scoreManager {
 
                 //making a list of the three highest scores
                 Collections.sort(scores, Collections.reverseOrder());
-                for (int i = 0; i < 3 && i < scores.size(); i++) {
+                for (int i = 0; i < 4 && i < scores.size(); i++) {
                     String highscore = (i + 1) + "- " + scores.get(i);
                     highscorelist.add(highscore);
                 }
