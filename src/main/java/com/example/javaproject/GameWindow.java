@@ -26,7 +26,7 @@ public class GameWindow {
     AtomicInteger level = new AtomicInteger(1);
     AtomicInteger HP = new AtomicInteger(3);
 
-    int framesSinceLastShot = 0;
+    int framesSinceLastShot = 15;
     int framesSinceLastAlienShot = 0;
     int framesSinceLastRandomAsteroid = 0;
 
@@ -97,7 +97,6 @@ public class GameWindow {
         double l = 0.1;
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd = new Random();
-            double rnd_1 = Math.random() * 25 + 30;
             Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),/*25,*/0.1, AsteroidType.LARGE);
             asteroids.add(asteroid);
         }
@@ -184,9 +183,9 @@ public class GameWindow {
 
             private void handleAlienShooting() {
                 if (alienShip.isAlive()) {
-                    if (framesSinceLastAlienShot >= 180) {
+                    if (framesSinceLastAlienShot >= 100) {
                         Projectile alienShot = alienShip.shootAtTarget(ship);
-
+                        alienShot.setSpeed(alienShip.getSpeed());
                         alienShoots.add(alienShot);
                         alienShot.move();
                         pane.getChildren().add(alienShot.getCharacter());
@@ -292,8 +291,6 @@ public class GameWindow {
                     for (int i = 0; i < newNumAsteroids; i++) {
 
                         Random rnd = new Random();
-                        double rnd_1 = Math.random() * 10 + 30;
-
                         Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), newScale, AsteroidType.LARGE);
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
@@ -325,7 +322,7 @@ public class GameWindow {
             }
 
             private void manageBulletCollisions() {
-                List<Asteroid> destroyedAsteroids = new ArrayList<>();
+                List<Asteroid> destroyedAsteroids;
 
                 //iterator required to avoid concurrent modification exception (removing item from list while iterating through it)
                 Iterator<Projectile> projectileIterator = shoots.iterator();

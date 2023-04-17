@@ -29,3 +29,5 @@ Conor	300
 Conor	5000
 jj	3700
 Tania	0
+Tania	400
+Tania	600

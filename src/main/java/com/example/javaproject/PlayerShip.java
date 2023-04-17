@@ -7,8 +7,6 @@ import java.util.List;
 
 public class PlayerShip extends AbstractGameElement {
 
-    private double speed = 0.0;
-
     private boolean invincible = false;
     public PlayerShip(int x, int y) {
         super(new CharacterFactory().createShip(), x, y);
@@ -20,11 +18,6 @@ public class PlayerShip extends AbstractGameElement {
         wrapScreen();
 
     }
-
-    public double getSpeed(){
-        return (double) this.movement.distance(0,0);
-    }
-
     public void turnLeft() {
         this.character.setRotate(this.character.getRotate() - 4);
     }
@@ -76,7 +69,7 @@ public class PlayerShip extends AbstractGameElement {
             while (this.isPositionNotSafe(characters, safeDistance)) {
                 this.character.setTranslateX(Math.random() * GameWindow.WIDTH);
                 this.character.setTranslateY(Math.random() * GameWindow.HEIGHT);
-            };
+            }
     }
 
 
