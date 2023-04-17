@@ -290,7 +290,6 @@ public class GameWindow {
                         // Reduce ship HP
                         damageShip();
                     }
-                    asteroid.move_speed += (0.01 * level.get());
                 });
 
                 //if numAsteroids <15 && numFramesSinceRandomAsteroid > 10
