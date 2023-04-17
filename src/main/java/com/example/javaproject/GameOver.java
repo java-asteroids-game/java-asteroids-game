@@ -49,16 +49,16 @@ public class GameOver {
 
         // Create a "Game Over" label
         Label gameOverLabel = new Label("GAME OVER");
-        gameOverLabel.setStyle("-fx-font-size: 65;");
+        gameOverLabel.setStyle("-fx-font: 65 consolas;");
         gameOverLabel.setTextFill(Color.WHITE);
         gameOverContainer.setAlignment(Pos.CENTER);
 
         // Create a TextField for user input
         TextField playerNameField = new TextField();
         playerNameField.setPromptText("Enter your name");
-        playerNameField.setStyle("-fx-font-size: 30; " +
+        playerNameField.setStyle("-fx-font: 30 consolas; " +
                 "-fx-text-fill: white; " +
-                "-fx-background-color: black; " +
+                "-fx-background-color: DARKGRAY; " +
                 "-fx-border-color: transparent; " +
                 "-fx-border-width: 0;");
         playerNameField.setMaxWidth(300);
@@ -66,8 +66,8 @@ public class GameOver {
         // Add listener to detect when the user has pressed enter
         playerNameField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
-                    displayHighScores(playerNameField);
-                    ScoreWindow.load(stage);
+                Scene highScoresScene = new ScoreWindow().showHighScoresScreen(stage);
+                stage.setScene(highScoresScene);
             }
         });
 
@@ -80,17 +80,11 @@ public class GameOver {
 
         // Animate the pane by changing its opacity from 0 to 1 and back to 0 repeatedly
         Timeline animation = new Timeline(
-                new KeyFrame(Duration.seconds(0), event -> gameOverLabel.setOpacity(0.0)),
-                new KeyFrame(Duration.seconds(0.5), event -> gameOverLabel.setOpacity(1.0)),
-                new KeyFrame(Duration.seconds(1), event -> gameOverLabel.setOpacity(0.0)),
-                new KeyFrame(Duration.seconds(1.5), event -> gameOverLabel.setOpacity(1.0)),
-                new KeyFrame(Duration.seconds(2), event -> gameOverLabel.setOpacity(0.0)),
-                new KeyFrame(Duration.seconds(2.5), event -> gameOverLabel.setOpacity(1.0)),
-                new KeyFrame(Duration.seconds(3), event -> gameOverLabel.setOpacity(0.0)),
-                new KeyFrame(Duration.seconds(3.5), event -> gameOverLabel.setOpacity(1.0))
+                new KeyFrame(Duration.seconds(0), event -> gameOverLabel.setOpacity(0.5)),
+                new KeyFrame(Duration.seconds(0.25), event -> gameOverLabel.setOpacity(1.0))
         );
 
-        animation.setCycleCount(1);
+        animation.setCycleCount(3);
         animation.play();
 
         return new Scene(gameOverPane);

@@ -13,7 +13,6 @@ public class PlayerShip extends AbstractGameElement {
     public void move() {
         this.character.setTranslateX(this.character.getTranslateX() + this.movement.getX());
         this.character.setTranslateY(this.character.getTranslateY() + this.movement.getY());
-
         wrapScreen();
 
     }

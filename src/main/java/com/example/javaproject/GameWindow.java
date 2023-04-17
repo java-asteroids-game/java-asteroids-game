@@ -92,9 +92,9 @@ public class GameWindow {
         pointsText.setFill(Color.WHITE);
         levelText.setFill(Color.WHITE);
         livesText.setFill(Color.WHITE);
-        pointsText.setStyle("-fx-font: 20 arial;");
-        levelText.setStyle("-fx-font: 20 arial;");
-        livesText.setStyle("-fx-font: 20 arial;");
+        pointsText.setStyle("-fx-font: 20 consolas;");
+        levelText.setStyle("-fx-font: 20 consolas;");
+        livesText.setStyle("-fx-font: 20 consolas;");
         pane.getChildren().add(pointsText);
         pane.getChildren().add(levelText);
         pane.getChildren().add(livesText);

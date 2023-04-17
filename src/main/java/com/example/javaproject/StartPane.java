@@ -4,18 +4,18 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-public class Pane {
+public class StartPane {
 
     public static final double WIDTH = 960;
     public static final double HEIGHT = 600;
 
-    private static Pane instance = new Pane();
+    private static StartPane instance = new StartPane();
     private Stage stage;
-    private GameWindow game = new GameWindow();
+    private GameWindow game;
     private ScoreWindow scoreWindow = new ScoreWindow();
-    private Pane(){}
+    private StartPane(){}
 
-    public static Pane getInstance(){
+    public static StartPane getInstance(){
         return instance;
     }
 
@@ -35,6 +35,7 @@ public class Pane {
     }
 
     public void gameStart() {
+        game = new GameWindow();
         game.load(stage,3);
     }
 

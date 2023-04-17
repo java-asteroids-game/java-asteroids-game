@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Pane.getInstance().scene(primaryStage);
+        StartPane.getInstance().scene(primaryStage);
     }
 
     public static void main(String[] args) {

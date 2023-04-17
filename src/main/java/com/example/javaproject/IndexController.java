@@ -18,12 +18,12 @@ public class IndexController {
 
     @FXML
     void mouseClickStart(MouseEvent event) {
-        Pane.getInstance().gameStart();
+        StartPane.getInstance().gameStart();
     }
     @FXML
     void mouseClickScore(MouseEvent event) {
         Stage stage = new Stage(); // Create a new Stage instance
-        Pane.getInstance().scorelist(stage); // Pass the Stage instance to the scorelist() method
+        StartPane.getInstance().scorelist(stage); // Pass the Stage instance to the scorelist() method
 
 //        Pane.getInstance().scorelist();
     }
@@ -61,6 +61,10 @@ public class IndexController {
     @FXML
     void mouseClickControls(MouseEvent event) {
         Stage stage1 = new Stage(); // Create a new Stage instance
-        Pane.getInstance().showControls(stage1); // Pass the Stage instance to the showControls() method
+        StartPane.getInstance().showControls(stage1); // Pass the Stage instance to the showControls() method
+    }
+
+    public void getStartScreen(){
+
     }
 }

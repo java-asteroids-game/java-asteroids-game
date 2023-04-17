@@ -76,6 +76,7 @@ public abstract class AbstractGameElement {
     }
 
     public abstract void move();
+
     public abstract boolean collide(AbstractGameElement other);
 //    public boolean setAlive(boolean alive){ return !alive; }
 //

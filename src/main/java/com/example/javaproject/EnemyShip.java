@@ -68,8 +68,6 @@ public class EnemyShip extends AbstractGameElement {
     }
 
 
-
-
     public boolean collide(AbstractGameElement other) {
         Shape collisionArea = Shape.intersect(this.character, other.getCharacter());
         return collisionArea.getBoundsInLocal().getWidth() != -1;
