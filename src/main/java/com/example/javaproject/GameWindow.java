@@ -237,28 +237,72 @@ public class GameWindow {
             }
 
             private void damageShip() {
-                HP.decrementAndGet();
+                if (!ship.isInvincible()) {
+                    HP.decrementAndGet();
 
-                if (HP.get() > 0) {
-                    //get children method to add a shape
-                    ship.character.setTranslateX(Math.random() * WIDTH);
-                    ship.character.setTranslateY(Math.random() * HEIGHT);
-
-                    while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
+                    if (HP.get() > 0) {
                         ship.character.setTranslateX(Math.random() * WIDTH);
                         ship.character.setTranslateY(Math.random() * HEIGHT);
-                    }
-                    ship.setMovement(ship.getMovement().normalize());
-                    updateGameInformation(pointsText, levelText, livesText);
-                } else {
-                    stop();
-                    pane.getChildren().clear();
-                    int finalPoints = points.get();
-                    Scene gameOverScene = new GameOver().showGameOverScreen(stage, finalPoints);
-                    stage.setScene(gameOverScene);
-                }
 
-                updateGameInformation(pointsText, levelText, livesText);
+                        while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
+                            ship.character.setTranslateX(Math.random() * WIDTH);
+                            ship.character.setTranslateY(Math.random() * HEIGHT);
+                        }
+                        ship.setMovement(ship.getMovement().normalize());
+
+                        ship.setInvincible(true); // Set ship invincible
+
+                        // Blinking animation
+                        Timeline blinkTimeline = new Timeline(
+                                new KeyFrame(Duration.ZERO, e -> ship.getCharacter().setVisible(true)),
+                                new KeyFrame(Duration.millis(100), e -> ship.getCharacter().setVisible(false)),
+                                new KeyFrame(Duration.millis(200), e -> ship.getCharacter().setVisible(true))
+                        );
+                        blinkTimeline.setCycleCount(15); // Number of blinks (15 blinks in 3 seconds)
+                        blinkTimeline.play();
+
+                        Timer timer = new Timer();
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                ship.setInvincible(false); // Remove invincibility after 3 seconds
+                                ship.getCharacter().setVisible(true); // Ensure the ship is visible after the invincibility period
+                            }
+                        }, 3000); // Invincibility duration in milliseconds (3 seconds)
+
+                        updateGameInformation(pointsText, levelText, livesText);
+                    } else {
+                        stop();
+                        pane.getChildren().clear();
+                        int finalPoints = points.get();
+                        Scene gameOverScene = new GameOver().showGameOverScreen(stage, finalPoints);
+                        stage.setScene(gameOverScene);
+                    }
+
+                    updateGameInformation(pointsText, levelText, livesText);
+                }
+//                HP.decrementAndGet();
+//
+//                if (HP.get() > 0) {
+//                    //get children method to add a shape
+//                    ship.character.setTranslateX(Math.random() * WIDTH);
+//                    ship.character.setTranslateY(Math.random() * HEIGHT);
+//
+//                    while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
+//                        ship.character.setTranslateX(Math.random() * WIDTH);
+//                        ship.character.setTranslateY(Math.random() * HEIGHT);
+//                    }
+//                    ship.setMovement(ship.getMovement().normalize());
+//                    updateGameInformation(pointsText, levelText, livesText);
+//                } else {
+//                    stop();
+//                    pane.getChildren().clear();
+//                    int finalPoints = points.get();
+//                    Scene gameOverScene = new GameOver().showGameOverScreen(stage, finalPoints);
+//                    stage.setScene(gameOverScene);
+//                }
+//
+//                updateGameInformation(pointsText, levelText, livesText);
             }
             private void handleCollisions() {
                 manageBulletCollisions();

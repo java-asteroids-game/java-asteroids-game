@@ -6,6 +6,7 @@ public class PlayerShip extends AbstractGameElement {
 
     private double speed = 0.0;
 
+    private boolean invincible = false;
     public PlayerShip(int x, int y) {
         super(new CharacterFactory().createShip(), x, y);
     }
@@ -36,7 +37,17 @@ public class PlayerShip extends AbstractGameElement {
         this.movement = this.movement.add(changeX, changeY);
     }
 
+    public boolean isInvincible() {
+        return invincible;
+    }
+
+    public void setInvincible(boolean invincible) {
+        this.invincible = invincible;
+    }
     public boolean collide(AbstractGameElement other) {
+        if (invincible) {
+            return false;
+        }
         Shape collisionArea = Shape.intersect(this.character, other.getCharacter());
         return collisionArea.getBoundsInLocal().getWidth() != -1;
     }
