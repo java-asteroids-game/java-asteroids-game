@@ -11,14 +11,12 @@ public class Projectile extends AbstractGameElement {
     private final long creationTime;
     public  boolean alive;
 
-
     public Projectile(int x, int y) {
         super(new CharacterFactory().createBullet(), x, y);
         this.timeToLive = MAX_FLIGHT_TIME;
         this.creationTime = System.nanoTime();
         this.alive = true;
     }
-
 
     public void move() {
         double changeX = Math.cos(Math.toRadians(this.getCharacter().getRotate()));
@@ -44,7 +42,7 @@ public class Projectile extends AbstractGameElement {
         }
         return false;
     }
-
+    
     public boolean isAlive() {
         long elapsedTime = (System.nanoTime() - creationTime) / 1_000_000_000;
         return alive && elapsedTime < timeToLive;

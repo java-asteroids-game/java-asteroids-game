@@ -8,6 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import javafx.geometry.Point2D;
 import java.util.*;
 public class Controls {
 
@@ -70,10 +71,25 @@ public class Controls {
             pressedKeys.put(event.getCode(), Boolean.TRUE);
         });
 
+        List<Asteroid> asteroids = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            Random rnd= new Random();
+            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),/*25,*/0.3, AsteroidType.SMALL);
+            asteroids.add(asteroid);
+        }
+        asteroids.forEach(asteroid -> pane1.getChildren().add(asteroid.getCharacter()));
+
         new AnimationTimer() {
 
             @Override
             public void handle(long now) {
+
+                if (asteroids.size() < 10) {
+                    Random rnd= new Random();
+                    Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),/*35,*/0.5, AsteroidType.SMALL);
+                    asteroids.add(asteroid);
+                    pane1.getChildren().add(asteroid.getCharacter());
+                    }
 
                 if (pressedKeys.getOrDefault(KeyCode.A, false) && !pressedKeys.getOrDefault(KeyCode.RIGHT, false)) {
                     ship.turnLeft();
@@ -93,7 +109,7 @@ public class Controls {
                 //can use an or operator here, as logically if moveAndShootPressed is true, then Space must be pressed
                 if (pressedKeys.getOrDefault(KeyCode.SPACE, false) || moveAndShootPressed) {
                     // Check if enough frames have passed since the last shot
-                    if (framesSinceLastShot >= 10) {
+                    if (framesSinceLastShot >= 16) {
                         // When shooting the bullet in the same direction as the ship
                         Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
                                 (int) ship.getCharacter().getTranslateY());
@@ -113,17 +129,54 @@ public class Controls {
                 framesSinceLastShot++;
 
                 ship.move();
+                asteroids.forEach(asteroid -> asteroid.move());
+                asteroids.forEach(asteroid -> {
+                    if (ship.collide(asteroid)) {
+                        ship.character.setTranslateX((double) WIDTH / 2);
+                        ship.character.setTranslateY(HEIGHT/2);
+                        Point2D point = new Point2D(0, 0);
+                        ship.setMovement(point);
+                        while (asteroid.collide(ship)) {
+                            ship.character.setTranslateX(Math.random() * WIDTH);
+                            ship.character.setTranslateY(Math.random() * HEIGHT);
+                        }
+                    }
+                    });
+
 
                 Iterator<Projectile> iterator = shoots.iterator();
                 while(iterator.hasNext()) {
                     Projectile shoot = iterator.next();
                     if(shoot.outOfBounds()) {
                         iterator.remove();
+                        pane1.getChildren().remove(shoot.getCharacter());
                     } else {
                         shoot.move();
                     }
                 }
 
+                List<Projectile> destroy_asteroid = shoots.stream().filter(shot -> {
+                    List<Asteroid> destroy = asteroids.stream()
+                            .filter(asteroids -> asteroids.collide(shot))
+                            .toList();
+                    if (destroy.isEmpty()) {
+                        return false;
+                    }
+                    // Remove destroyed asteroid
+                    destroy.forEach(delete -> {
+                        asteroids.remove(delete);
+                        pane1.getChildren().remove(delete.getCharacter());
+
+                        // Count Level up
+                    });
+                    return true;
+                }).toList();
+
+                // Add points,HP and level
+                destroy_asteroid.forEach(shot -> {
+                    pane1.getChildren().remove(shot.getCharacter());
+                    shoots.remove(shot);
+                });
             }
 
         }.start();

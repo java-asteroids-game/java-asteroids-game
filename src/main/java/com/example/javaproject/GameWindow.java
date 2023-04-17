@@ -226,10 +226,7 @@ public class GameWindow{
 
                 ship.move();
                 alienShip.move();
-                asteroids.forEach(asteroid -> {
-                    asteroid.move();
-                });
-
+                asteroids.forEach(asteroid -> asteroid.move());
 
                 // -------------------------------------- MANAGE BULLET COLLISIONS WITH ASTEROIDS --------------------------------------------------
                 List<Asteroid> destroyedAsteroids = new ArrayList<>();
@@ -243,7 +240,7 @@ public class GameWindow{
                     if (shoot.outOfBounds()) {
                         projectileIterator.remove();
                         pane.getChildren().remove(shoot.getCharacter());
-                    // else update the position of the projectile
+                        // else update the position of the projectile
                     } else {
                         shoot.move();
 
@@ -261,18 +258,26 @@ public class GameWindow{
 
                         // If any asteroids have been hit by a projectile, remove them
                         if (!destroyedAsteroids.isEmpty()) {
-                            destroyedAsteroids.forEach(asteroid -> {
-                                asteroids.remove(asteroid);
-                                pane.getChildren().remove(asteroid.getCharacter());
-
-                                // Define asteroid functionality on destroy
-                                for (int i = 0; i < 2; i++) {
-                                    if (asteroid.getSize() > 10) {
-                                        Asteroid newAsteroid = new Asteroid((int) asteroid.getCharacter().getTranslateX(),
-                                                (int) asteroid.getCharacter().getTranslateY(), asteroid.getSize() * scale, l + 0.2);
-                                        asteroids.add(newAsteroid);
-                                        pane.getChildren().add(newAsteroid.getCharacter());
-                                    }
+                            destroyedAsteroids.forEach(delete -> {
+                            asteroids.remove(delete);
+                            pane.getChildren().remove(delete.getCharacter());
+                            for (int i = 0; i < 2 ; i++) {
+                                if (delete.getType()== AsteroidType.SPECIAL){
+                                    Asteroid asteroid = new Asteroid((int) delete.getCharacter()
+                                            .getTranslateX(),(int)delete.getCharacter().getTranslateY(),/*25,*/l + 0.2, AsteroidType.LARGE);
+                                    asteroids.add(asteroid);
+                                    pane.getChildren().add(asteroid.getCharacter());
+                                }
+                                else if (delete.getType() == AsteroidType.LARGE){
+                                    Asteroid asteroid = new Asteroid((int) delete.getCharacter()
+                                            .getTranslateX(),(int)delete.getCharacter().getTranslateY(),/*25,*/l + 0.2, AsteroidType.MEDIUM);
+                                    asteroids.add(asteroid);
+                                    pane.getChildren().add(asteroid.getCharacter());
+                                }else if (delete.getType() == AsteroidType.MEDIUM){
+                                    Asteroid asteroid = new Asteroid((int) delete.getCharacter()
+                                            .getTranslateX(),(int)delete.getCharacter().getTranslateY(),/*12,*/l + 0.2, AsteroidType.SMALL);
+                                    asteroids.add(asteroid);
+                                    pane.getChildren().add(asteroid.getCharacter());
                                 }
                             });
 
@@ -329,11 +334,8 @@ public class GameWindow{
                 // Hyper jumps and random reborn position
                 double random_x = Math.random() * 1000 % WIDTH;
                 double random_y = Math.random() * 700 % HEIGHT;
-
-
-                // -------------------------------- MANAGE SHIP AND ASTEROID COLLISION ----------------------------------
+                asteroids.forEach(asteroid -> asteroid.move());
                 asteroids.forEach(asteroid -> {
-                    // If the ship collides with an asteroid
                     if (ship.collide(asteroid)) {
                         // Reduce ship HP
                         damageShip();
@@ -344,7 +346,7 @@ public class GameWindow{
                 if(Math.random() < 0.005) {
                     double rnd_2= Math.random()*10+30;
                     double rnd_3=Math.random()*1000;
-                    Asteroid asteroid = new Asteroid((int) rnd_3%WIDTH, 0,rnd_2,l+0.3*level.get());
+                    Asteroid asteroid = new Asteroid((int) rnd_3% WIDTH, 0,rnd_2,l+0.3*level.get());
                     if(!asteroid.collide(ship)) {
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
@@ -377,6 +379,8 @@ public class GameWindow{
                     Scene gameOverScene = new GameOver().showGameOverScreen(stage, finalPoints);
                     stage.setScene(gameOverScene);
                 }
+
+                updateGameInformation(points, HP, level, asteroids, text, text1, text2);
             }
 
 
