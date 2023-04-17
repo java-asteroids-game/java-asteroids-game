@@ -56,9 +56,6 @@ public class ScoreWindow {
             stage.setScene(scene); // Set the Scene to the Stage
             stage.setTitle("High Score!!!"); // Set the title of the window
             stage.show(); // Display the Stage
-
-
-
     }
 
     public Scene showHighScoresScreen(Stage stage){

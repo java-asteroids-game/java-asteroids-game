@@ -36,7 +36,7 @@ public class GameWindow {
     AtomicInteger level = new AtomicInteger(1);
     AtomicInteger HP = new AtomicInteger(3);
 
-    int framesSinceLastShot = 0;
+    int framesSinceLastShot = 15;
     int framesSinceLastAlienShot = 0;
     int framesSinceLastRandomAsteroid = 0;
     int framesSinceLastGodMode = 0;
@@ -44,11 +44,12 @@ public class GameWindow {
     List<Asteroid> asteroids = new ArrayList<>();
     List<Projectile> shoots = new LinkedList<>();
     List<Projectile> alienShoots = new ArrayList<>();
+    List <AbstractGameElement> characters = new ArrayList<>();
     PlayerShip ship = new PlayerShip(WIDTH / 2, HEIGHT / 2);
     final EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2);
 
 
-    public void asteroidsHitUpdatePoints(AtomicInteger points, AtomicInteger HP, AtomicInteger level, List<Asteroid> asteroids) {
+    public void asteroidsHitUpdatePoints() {
         points.set(points.get() + 100);
 
         if (points.get() % 1000 == 0) {
@@ -63,25 +64,6 @@ public class GameWindow {
         levelText.setText("Level: " + level);
     }
 
-    private boolean isPositionNotSafe(Point2D newPosition, double safeDistance) {
-        // Check for collisions with asteroids
-        for (Asteroid asteroid : asteroids) {
-            if (newPosition.distance(asteroid.getCharacter().getTranslateX(), asteroid.getCharacter().getTranslateY()) < safeDistance) {
-                return true;
-            }
-        }
-        // Check for collisions with projectiles
-        for (Projectile alienShoot : alienShoots) {
-            if (newPosition.distance(alienShoot.getCharacter().getTranslateX(), alienShoot.getCharacter().getTranslateY()) < safeDistance) {
-                return true;
-            }
-        }
-        // Check for collisions with alien ship
-        if (alienShip.isAlive() && newPosition.distance(alienShip.getCharacter().getTranslateX(), alienShip.getCharacter().getTranslateY()) < safeDistance) {
-            return true;
-        }
-        return false;
-    }
 
     public void load(Stage stage, int numAsteroids) {
         Pane pane = new Pane();
@@ -135,7 +117,6 @@ public class GameWindow {
         double l = 0.1;
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd = new Random();
-            double rnd_1 = Math.random() * 25 + 30;
             Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),/*25,*/0.1, AsteroidType.LARGE);
             asteroids.add(asteroid);
         }
@@ -232,16 +213,15 @@ public class GameWindow {
                     }
                 });
 
-//                if (pressedKeys.getOrDefault(KeyCode.SHIFT, false)) {
-//                    handleHyperJump();
-//                }
             }
 
             private void handleShipShooting() {
-                if (framesSinceLastShot >= 15 && shoots.size() < 6) {
+                if (framesSinceLastShot >= 15 && shoots.size() < 8) {
                     // When shooting the bullet in the same direction as the ship
                     Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
                             (int) ship.getCharacter().getTranslateY());
+
+                    shot.setSpeed(ship.getSpeed());
 
                     shot.getCharacter().setRotate(ship.getCharacter().getRotate());
                     shoots.add(shot);
@@ -257,9 +237,9 @@ public class GameWindow {
 
             private void handleAlienShooting() {
                 if (alienShip.isAlive()) {
-                    if (framesSinceLastAlienShot >= 180) {
+                    if (framesSinceLastAlienShot >= 100) {
                         Projectile alienShot = alienShip.shootAtTarget(ship);
-
+                        alienShot.setSpeed(alienShip.getSpeed());
                         alienShoots.add(alienShot);
                         alienShot.move();
                         pane.getChildren().add(alienShot.getCharacter());
@@ -274,13 +254,13 @@ public class GameWindow {
             }
 
             private void handleHyperJump() {
-                ship.character.setTranslateX(Math.random() * WIDTH);
-                ship.character.setTranslateY(Math.random() * HEIGHT);
-                while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
-                    ship.character.setTranslateX(Math.random() * WIDTH);
-                    ship.character.setTranslateY(Math.random() * HEIGHT);
-                };
+                characters.add(alienShip);
+                characters.addAll(alienShoots);
+                characters.addAll(asteroids);
+                ship.moveSomewhereSafe(characters, 200);
+                characters.clear();
             }
+
 
             private void moveObjects() {
                 ship.move();
@@ -290,19 +270,34 @@ public class GameWindow {
             }
 
             private void damageShip() {
-                HP.decrementAndGet();
+                if (!ship.isInvincible()) {
+                    HP.decrementAndGet();
 
                 if (HP.get() > 0) {
                     //get children method to add a shape
-                    ship.character.setTranslateX(Math.random() * WIDTH);
-                    ship.character.setTranslateY(Math.random() * HEIGHT);
-
-                    while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
-                        ship.character.setTranslateX(Math.random() * WIDTH);
-                        ship.character.setTranslateY(Math.random() * HEIGHT);
-                    }
+                    handleHyperJump();
                     ship.setMovement(ship.getMovement().normalize());
                     updateGameInformation(pointsText, levelText, livesText);
+
+                    ship.setInvincible(true); // Set ship invincible
+
+                    // Blinking animation
+                    Timeline blinkTimeline = new Timeline(
+                            new KeyFrame(Duration.ZERO, e -> ship.getCharacter().setVisible(true)),
+                            new KeyFrame(Duration.millis(100), e -> ship.getCharacter().setVisible(false)),
+                            new KeyFrame(Duration.millis(200), e -> ship.getCharacter().setVisible(true))
+                    );
+                    blinkTimeline.setCycleCount(15); // Number of blinks (15 blinks in 3 seconds)
+                    blinkTimeline.play();
+
+                    Timer timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            ship.setInvincible(false); // Remove invincibility after 3 seconds
+                            ship.getCharacter().setVisible(true); // Ensure the ship is visible after the invincibility period
+                        }
+                    }, 3000);
                 } else {
                     stop();
                     pane.getChildren().clear();
@@ -311,7 +306,30 @@ public class GameWindow {
                     stage.setScene(gameOverScene);
                 }
 
-                updateGameInformation(pointsText, levelText, livesText);
+                    updateGameInformation(pointsText, levelText, livesText);
+                }
+//                HP.decrementAndGet();
+//
+//                if (HP.get() > 0) {
+//                    //get children method to add a shape
+//                    ship.character.setTranslateX(Math.random() * WIDTH);
+//                    ship.character.setTranslateY(Math.random() * HEIGHT);
+//
+//                    while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
+//                        ship.character.setTranslateX(Math.random() * WIDTH);
+//                        ship.character.setTranslateY(Math.random() * HEIGHT);
+//                    }
+//                    ship.setMovement(ship.getMovement().normalize());
+//                    updateGameInformation(pointsText, levelText, livesText);
+//                } else {
+//                    stop();
+//                    pane.getChildren().clear();
+//                    int finalPoints = points.get();
+//                    Scene gameOverScene = new GameOver().showGameOverScreen(stage, finalPoints);
+//                    stage.setScene(gameOverScene);
+//                }
+//
+//                updateGameInformation(pointsText, levelText, livesText);
             }
             private void handleCollisions() {
                 manageBulletCollisions();
@@ -327,8 +345,6 @@ public class GameWindow {
                     for (int i = 0; i < newNumAsteroids; i++) {
 
                         Random rnd = new Random();
-                        double rnd_1 = Math.random() * 10 + 30;
-
                         Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), newScale, AsteroidType.LARGE);
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
@@ -345,10 +361,6 @@ public class GameWindow {
                     }
                 });
 
-                //if numAsteroids <15 && numFramesSinceRandomAsteroid > 10
-                //Recreate random position asteroids
-
-                //if (Math.random() < 0.005) {
                 if(framesSinceLastRandomAsteroid >10 && Math.random() < 0.005){
                     double rnd_2 = Math.random() * 1000;
                     Asteroid asteroid = new Asteroid((int) rnd_2 % WIDTH, 0, l, AsteroidType.MEDIUM);
@@ -364,7 +376,7 @@ public class GameWindow {
             }
 
             private void manageBulletCollisions() {
-                List<Asteroid> destroyedAsteroids = new ArrayList<>();
+                List<Asteroid> destroyedAsteroids;
 
                 //iterator required to avoid concurrent modification exception (removing item from list while iterating through it)
                 Iterator<Projectile> projectileIterator = shoots.iterator();
@@ -417,7 +429,7 @@ public class GameWindow {
                             });
 
                             // Handle points update
-                            asteroidsHitUpdatePoints(points, HP, level, asteroids);
+                            asteroidsHitUpdatePoints();
 
                             // Remove the projectile that collided with the asteroid
                             projectileIterator.remove();

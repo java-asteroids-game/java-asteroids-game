@@ -78,8 +78,10 @@ public abstract class AbstractGameElement {
     public abstract void move();
 
     public abstract boolean collide(AbstractGameElement other);
-//    public boolean setAlive(boolean alive){ return !alive; }
-//
-//    public boolean isAlive(){ return true; }
+
+    public double getSpeed(){
+        return this.movement.distance(0,0);
+    }
+
 
 }
