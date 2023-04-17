@@ -153,6 +153,16 @@ public class GameWindow {
                 if (pressedKeys.getOrDefault(KeyCode.W, false)) {
                     ship.accelerate();
                 }
+                if (pressedKeys.getOrDefault(KeyCode.LEFT, false)) {
+                    ship.turnLeft();
+                }
+
+                if (pressedKeys.getOrDefault(KeyCode.RIGHT, false)) {
+                    ship.turnRight();
+                }
+                if (pressedKeys.getOrDefault(KeyCode.UP, false)) {
+                    ship.accelerate();
+                }
 
                 boolean moveAndShootPressed = (pressedKeys.getOrDefault(KeyCode.D, false) || pressedKeys.getOrDefault(KeyCode.A, false) || pressedKeys.getOrDefault(KeyCode.W, false))
                         && pressedKeys.getOrDefault(KeyCode.SPACE, false);
@@ -161,9 +171,17 @@ public class GameWindow {
                     handleShipShooting();
                 }
 
-                if (pressedKeys.getOrDefault(KeyCode.SHIFT, false)) {
-                    handleHyperJump();
-                }
+                scene.setOnKeyPressed(event -> {
+                    pressedKeys.put(event.getCode(), Boolean.TRUE);
+
+                    if (event.getCode() == KeyCode.SHIFT) {
+                        handleHyperJump();
+                    }
+                });
+
+//                if (pressedKeys.getOrDefault(KeyCode.SHIFT, false)) {
+//                    handleHyperJump();
+//                }
             }
 
             private void handleShipShooting() {
@@ -186,7 +204,7 @@ public class GameWindow {
 
             private void handleAlienShooting() {
                 if (alienShip.isAlive()) {
-                    if (framesSinceLastAlienShot >= 40) {
+                    if (framesSinceLastAlienShot >= 180) {
                         Projectile alienShot = alienShip.shootAtTarget(ship);
 
                         alienShoots.add(alienShot);
