@@ -29,8 +29,9 @@ public class GameWindow {
 
     int framesSinceLastShot = 0;
     int framesSinceLastAlienShot = 0;
+    int framesSinceLastRandomAsteroid = 0;
 
-    List<Asteroid> asteroids = new ArrayList<>();
+    List<Asteroid> asteroids = new LinkedList<>();
     List<Projectile> shoots = new ArrayList<>();
     List<Projectile> alienShoots = new ArrayList<>();
     PlayerShip ship = new PlayerShip(WIDTH / 2, HEIGHT / 2);
@@ -69,10 +70,8 @@ public class GameWindow {
         if (alienShip.isAlive() && newPosition.distance(alienShip.getCharacter().getTranslateX(), alienShip.getCharacter().getTranslateY()) < safeDistance) {
             return true;
         }
-
         return false;
     }
-
 
     public void load(Stage stage, int numAsteroids) {
         Pane pane = new Pane();
@@ -137,7 +136,12 @@ public class GameWindow {
         });
 
         new AnimationTimer() {
+
             private void handleInput() {
+                //for debugging
+                //System.out.println("Asteroids: " + asteroids.size());
+                //System.out.println("Shoots: " + shoots.size());
+
                 if (pressedKeys.getOrDefault(KeyCode.A, false) && !pressedKeys.getOrDefault(KeyCode.RIGHT, false)) {
                     ship.turnLeft();
                 }
@@ -149,6 +153,16 @@ public class GameWindow {
                 if (pressedKeys.getOrDefault(KeyCode.W, false)) {
                     ship.accelerate();
                 }
+                if (pressedKeys.getOrDefault(KeyCode.LEFT, false)) {
+                    ship.turnLeft();
+                }
+
+                if (pressedKeys.getOrDefault(KeyCode.RIGHT, false)) {
+                    ship.turnRight();
+                }
+                if (pressedKeys.getOrDefault(KeyCode.UP, false)) {
+                    ship.accelerate();
+                }
 
                 boolean moveAndShootPressed = (pressedKeys.getOrDefault(KeyCode.D, false) || pressedKeys.getOrDefault(KeyCode.A, false) || pressedKeys.getOrDefault(KeyCode.W, false))
                         && pressedKeys.getOrDefault(KeyCode.SPACE, false);
@@ -157,13 +171,21 @@ public class GameWindow {
                     handleShipShooting();
                 }
 
-                if (pressedKeys.getOrDefault(KeyCode.SHIFT, false)) {
-                    handleHyperJump();
-                }
+                scene.setOnKeyPressed(event -> {
+                    pressedKeys.put(event.getCode(), Boolean.TRUE);
+
+                    if (event.getCode() == KeyCode.SHIFT) {
+                        handleHyperJump();
+                    }
+                });
+
+//                if (pressedKeys.getOrDefault(KeyCode.SHIFT, false)) {
+//                    handleHyperJump();
+//                }
             }
 
             private void handleShipShooting() {
-                if (framesSinceLastShot >= 10) {
+                if (framesSinceLastShot >= 15) {
                     // When shooting the bullet in the same direction as the ship
                     Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
                             (int) ship.getCharacter().getTranslateY());
@@ -182,7 +204,7 @@ public class GameWindow {
 
             private void handleAlienShooting() {
                 if (alienShip.isAlive()) {
-                    if (framesSinceLastAlienShot >= 30) {
+                    if (framesSinceLastAlienShot >= 180) {
                         Projectile alienShot = alienShip.shootAtTarget(ship);
 
                         alienShoots.add(alienShot);
@@ -199,12 +221,12 @@ public class GameWindow {
             }
 
             private void handleHyperJump() {
+                ship.character.setTranslateX(Math.random() * WIDTH);
+                ship.character.setTranslateY(Math.random() * HEIGHT);
+                while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
                     ship.character.setTranslateX(Math.random() * WIDTH);
                     ship.character.setTranslateY(Math.random() * HEIGHT);
-                    while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
-                        ship.character.setTranslateX(Math.random() * WIDTH);
-                        ship.character.setTranslateY(Math.random() * HEIGHT);
-                    }
+                };
             }
 
             private void moveObjects() {
@@ -263,7 +285,6 @@ public class GameWindow {
                     levelText.setText("Level: " + level.get());
                 }
 
-
                 asteroids.forEach(asteroid -> {
                     if (ship.collide(asteroid)) {
                         // Reduce ship HP
@@ -272,17 +293,24 @@ public class GameWindow {
                     asteroid.move_speed += (0.01 * level.get());
                 });
 
+                //if numAsteroids <15 && numFramesSinceRandomAsteroid > 10
                 //Recreate random position asteroids
-                if (Math.random() < 0.005) {
-                    double rnd_3 = Math.random() * 1000;
-                    Asteroid asteroid = new Asteroid((int) rnd_3 % WIDTH, 0, l, AsteroidType.MEDIUM);
+
+                //if (Math.random() < 0.005) {
+                if(framesSinceLastRandomAsteroid >10 && Math.random() < 0.005){
+                    double rnd_2 = Math.random() * 1000;
+                    Asteroid asteroid = new Asteroid((int) rnd_2 % WIDTH, 0, l, AsteroidType.MEDIUM);
                     if (!asteroid.collide(ship)) {
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
                     }
+                    framesSinceLastRandomAsteroid = 0;
                 }
 
+
+
                 updateGameInformation(pointsText, levelText, livesText);
+                framesSinceLastRandomAsteroid++;
             }
 
             private void manageBulletCollisions() {
