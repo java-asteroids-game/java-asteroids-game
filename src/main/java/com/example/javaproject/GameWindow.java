@@ -42,7 +42,7 @@ public class GameWindow {
         points.set(points.get() + 100);
 
         if (points.get() % 1000 == 0) {
-            HP.set(HP.get() + 1);
+            HP.incrementAndGet();
             level.incrementAndGet();
         }
     }
@@ -232,8 +232,8 @@ public class GameWindow {
             private void moveObjects() {
                 ship.move();
                 alienShip.move();
-                handleAlienShooting();
                 asteroids.forEach(asteroid -> asteroid.move());
+                handleAlienShooting();
             }
 
             private void damageShip() {
@@ -290,6 +290,7 @@ public class GameWindow {
                         // Reduce ship HP
                         damageShip();
                     }
+                    asteroid.move_speed += (0.01 * level.get());
                 });
 
                 //if numAsteroids <15 && numFramesSinceRandomAsteroid > 10
