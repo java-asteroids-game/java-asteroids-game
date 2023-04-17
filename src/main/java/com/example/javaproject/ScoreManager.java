@@ -29,6 +29,7 @@ public class ScoreManager {
             ArrayList<String> highScoreList = new ArrayList<>();
             HashMap<String, Integer> scoresMap = new HashMap<>();
 
+
             try {
                 FileReader fileReader = new FileReader("scores.txt");
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -39,10 +40,19 @@ public class ScoreManager {
                     if (parts.length == 2) { // Ensure there are two parts (name and score)
                         String name = parts[0]; // First part is the name
                         int score = Integer.parseInt(parts[1]); // Second part is the score
-                        scoresMap.put(name, score);
+
+                        if (scoresMap.containsKey(name)) {
+                            if (scoresMap.get(name) < score) {
+                                scoresMap.replace(name, score);
+                            }
+                        }
                     }
                 }
                 bufferedReader.close();
+
+                scoresMap.forEach((name, score) -> {
+                    System.out.println(name + ": " + score);
+                });
 
                 // Sort the HashMap by highest scores
                 List<Map.Entry<String, Integer>> sortedEntries = new ArrayList<>(scoresMap.entrySet());

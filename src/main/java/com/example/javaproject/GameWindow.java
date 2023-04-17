@@ -41,12 +41,9 @@ public class GameWindow {
         points.set(points.get() + 100);
 
         if (points.get() % 1000 == 0) {
-            HP.set(HP.get() + 1);
+            HP.incrementAndGet();
             level.incrementAndGet();
         }
-        asteroids.forEach(asteroid -> {
-            asteroid.move_speed += (0.01 * level.get());
-        });
     }
 
     private void updateGameInformation(Text pointsText, Text levelText, Text livesText) {
@@ -202,21 +199,19 @@ public class GameWindow {
             }
 
             private void handleHyperJump() {
-                asteroids.forEach(asteroid -> {
                     ship.character.setTranslateX(Math.random() * WIDTH);
                     ship.character.setTranslateY(Math.random() * HEIGHT);
                     while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
                         ship.character.setTranslateX(Math.random() * WIDTH);
                         ship.character.setTranslateY(Math.random() * HEIGHT);
                     }
-                });
             }
 
             private void moveObjects() {
                 ship.move();
                 alienShip.move();
-                handleAlienShooting();
                 asteroids.forEach(asteroid -> asteroid.move());
+                handleAlienShooting();
             }
 
             private void damageShip() {
@@ -274,11 +269,11 @@ public class GameWindow {
                         // Reduce ship HP
                         damageShip();
                     }
+                    asteroid.move_speed += (0.01 * level.get());
                 });
 
                 //Recreate random position asteroids
                 if (Math.random() < 0.005) {
-                    double rnd_2 = Math.random() * 10 + 30;
                     double rnd_3 = Math.random() * 1000;
                     Asteroid asteroid = new Asteroid((int) rnd_3 % WIDTH, 0, l, AsteroidType.MEDIUM);
                     if (!asteroid.collide(ship)) {
