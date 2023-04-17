@@ -54,17 +54,18 @@ public class GameWindow{
 
         //get children method to add a shape
         pane.getChildren().add(ship.getCharacter());
+//        pane.getChildren().add(alienShip.getCharacter());
 
-        // Show points ,level, and HP
+        // Show current points ,current level, and current HP
         Text text = new Text(30, 40, "Points: 0");
         Text text1 = new Text(30,80,"Level: 1");
         Text text2 = new Text(850,40,"Lives: 3");
         text.setFill(Color.WHITE);
         text1.setFill(Color.WHITE);
         text2.setFill(Color.WHITE);
-        text.setStyle("-fx-font-family: 'Bank Gothic'; -fx-font-size: 20px;");
-        text1.setStyle("-fx-font-family: 'Bank Gothic'; -fx-font-size: 20px;");
-        text2.setStyle("-fx-font-family: 'Bank Gothic'; -fx-font-size: 20px;");
+        text.setStyle("-fx-font: 20 arial;");
+        text1.setStyle("-fx-font: 20 arial;");
+        text2.setStyle("-fx-font: 20 arial;");
         pane.getChildren().add(text);
         pane.getChildren().add(text1);
         pane.getChildren().add(text2);
