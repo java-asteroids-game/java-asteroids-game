@@ -31,8 +31,8 @@ public class GameWindow {
     int framesSinceLastAlienShot = 0;
     int framesSinceLastRandomAsteroid = 0;
 
-    List<Asteroid> asteroids = new LinkedList<>();
-    List<Projectile> shoots = new ArrayList<>();
+    List<Asteroid> asteroids = new ArrayList<>();
+    List<Projectile> shoots = new LinkedList<>();
     List<Projectile> alienShoots = new ArrayList<>();
     PlayerShip ship = new PlayerShip(WIDTH / 2, HEIGHT / 2);
     final EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2);
@@ -305,8 +305,6 @@ public class GameWindow {
                     }
                     framesSinceLastRandomAsteroid = 0;
                 }
-
-
 
                 updateGameInformation(pointsText, levelText, livesText);
                 framesSinceLastRandomAsteroid++;
