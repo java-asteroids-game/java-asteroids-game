@@ -1,6 +1,9 @@
 package com.example.javaproject;
 
+import javafx.geometry.Point2D;
 import javafx.scene.shape.Shape;
+
+import java.util.List;
 
 public class PlayerShip extends AbstractGameElement {
 
@@ -15,6 +18,10 @@ public class PlayerShip extends AbstractGameElement {
         this.character.setTranslateY(this.character.getTranslateY() + this.movement.getY());
         wrapScreen();
 
+    }
+
+    public double getSpeed(){
+        return (double) this.movement.distance(0,0);
     }
 
     public void turnLeft() {
@@ -40,5 +47,26 @@ public class PlayerShip extends AbstractGameElement {
         Shape collisionArea = Shape.intersect(this.character, other.getCharacter());
         return collisionArea.getBoundsInLocal().getWidth() != -1;
     }
+
+    private boolean isPositionNotSafe(List<AbstractGameElement> characters, int safeDistance) {
+        Point2D newPosition = new Point2D(this.getCharacter().getTranslateX(), this.getCharacter().getTranslateX());
+        // Check for collisions with other characters
+        for (AbstractGameElement character : characters){
+            if (newPosition.distance(character.getCharacter().getTranslateX(), character.getCharacter().getTranslateY()) < safeDistance){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void moveSomewhereSafe(List<AbstractGameElement> characters, int safeDistance){
+            this.character.setTranslateY(Math.random() * GameWindow.WIDTH);
+            this.character.setTranslateY(Math.random() * GameWindow.HEIGHT);
+            while (this.isPositionNotSafe(characters, safeDistance)) {
+                this.character.setTranslateX(Math.random() * GameWindow.WIDTH);
+                this.character.setTranslateY(Math.random() * GameWindow.HEIGHT);
+            };
+    }
+
 
 }

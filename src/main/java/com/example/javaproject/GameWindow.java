@@ -5,7 +5,6 @@ package com.example.javaproject;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -32,8 +31,9 @@ public class GameWindow {
     int framesSinceLastRandomAsteroid = 0;
 
     List<Asteroid> asteroids = new ArrayList<>();
-    List<Projectile> shoots = new LinkedList<>();
+    List<Projectile> shoots = new ArrayList<>();
     List<Projectile> alienShoots = new ArrayList<>();
+    List <AbstractGameElement> characters = new ArrayList<>();
     PlayerShip ship = new PlayerShip(WIDTH / 2, HEIGHT / 2);
     final EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2);
 
@@ -53,25 +53,6 @@ public class GameWindow {
         levelText.setText("Level: " + level);
     }
 
-    private boolean isPositionNotSafe(Point2D newPosition, double safeDistance) {
-        // Check for collisions with asteroids
-        for (Asteroid asteroid : asteroids) {
-            if (newPosition.distance(asteroid.getCharacter().getTranslateX(), asteroid.getCharacter().getTranslateY()) < safeDistance) {
-                return true;
-            }
-        }
-        // Check for collisions with projectiles
-        for (Projectile alienShoot : alienShoots) {
-            if (newPosition.distance(alienShoot.getCharacter().getTranslateX(), alienShoot.getCharacter().getTranslateY()) < safeDistance) {
-                return true;
-            }
-        }
-        // Check for collisions with alien ship
-        if (alienShip.isAlive() && newPosition.distance(alienShip.getCharacter().getTranslateX(), alienShip.getCharacter().getTranslateY()) < safeDistance) {
-            return true;
-        }
-        return false;
-    }
 
     public void load(Stage stage, int numAsteroids) {
         Pane pane = new Pane();
@@ -179,16 +160,15 @@ public class GameWindow {
                     }
                 });
 
-//                if (pressedKeys.getOrDefault(KeyCode.SHIFT, false)) {
-//                    handleHyperJump();
-//                }
             }
 
             private void handleShipShooting() {
-                if (framesSinceLastShot >= 15 && shoots.size() < 6) {
+                if (framesSinceLastShot >= 15 && shoots.size() < 8) {
                     // When shooting the bullet in the same direction as the ship
                     Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
                             (int) ship.getCharacter().getTranslateY());
+
+                    shot.setSpeed(ship.getSpeed());
 
                     shot.getCharacter().setRotate(ship.getCharacter().getRotate());
                     shoots.add(shot);
@@ -221,13 +201,13 @@ public class GameWindow {
             }
 
             private void handleHyperJump() {
-                ship.character.setTranslateX(Math.random() * WIDTH);
-                ship.character.setTranslateY(Math.random() * HEIGHT);
-                while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
-                    ship.character.setTranslateX(Math.random() * WIDTH);
-                    ship.character.setTranslateY(Math.random() * HEIGHT);
-                };
+                characters.add(alienShip);
+                characters.addAll(alienShoots);
+                characters.addAll(asteroids);
+                ship.moveSomewhereSafe(characters, 200);
+                characters.clear();
             }
+
 
             private void moveObjects() {
                 ship.move();
@@ -241,13 +221,7 @@ public class GameWindow {
 
                 if (HP.get() > 0) {
                     //get children method to add a shape
-                    ship.character.setTranslateX(Math.random() * WIDTH);
-                    ship.character.setTranslateY(Math.random() * HEIGHT);
-
-                    while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
-                        ship.character.setTranslateX(Math.random() * WIDTH);
-                        ship.character.setTranslateY(Math.random() * HEIGHT);
-                    }
+                    handleHyperJump();
                     ship.setMovement(ship.getMovement().normalize());
                     updateGameInformation(pointsText, levelText, livesText);
                 } else {

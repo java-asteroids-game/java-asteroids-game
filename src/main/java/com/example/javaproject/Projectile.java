@@ -1,15 +1,15 @@
 package com.example.javaproject;
 
+import javafx.geometry.Point2D;
 import javafx.scene.shape.Shape;
 
 public class Projectile extends AbstractGameElement {
 
     private static final int MAX_FLIGHT_TIME = 180;
-    private static final int MAX_TRAVEL_DISTANCE = 1000;
     private int timeToLive;
-    private double traveledDistance;
     private final long creationTime;
     public  boolean alive;
+    public double speed;
 
     public Projectile(int x, int y) {
         super(new CharacterFactory().createBullet(), x, y);
@@ -18,12 +18,17 @@ public class Projectile extends AbstractGameElement {
         this.alive = true;
     }
 
-    public void move() {
-        double changeX = Math.cos(Math.toRadians(this.getCharacter().getRotate()));
-        double changeY = Math.sin(Math.toRadians(this.getCharacter().getRotate()));
+    public void setSpeed(double speed) {
+        double minSpeed = 5.0;
+        this.speed = Math.max(minSpeed, speed);
+    }
 
-        this.getCharacter().setTranslateX(getCharacter().getTranslateX() + changeX * 5);
-        this.getCharacter().setTranslateY(this.getCharacter().getTranslateY() + changeY * 5);
+    public void move() {
+        this.movement = new Point2D(Math.cos(Math.toRadians(this.getCharacter().getRotate())),
+                Math.sin(Math.toRadians(this.getCharacter().getRotate()))).multiply(this.speed);
+
+        this.getCharacter().setTranslateX(getCharacter().getTranslateX() + this.movement.getX());
+        this.getCharacter().setTranslateY(this.getCharacter().getTranslateY() + this.movement.getY());
 
     }
 
