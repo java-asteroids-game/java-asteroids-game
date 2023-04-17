@@ -39,7 +39,7 @@ public class Projectile extends AbstractGameElement {
         if (this.getCharacter().getTranslateX() < 0 || this.getCharacter().getTranslateX() > GameWindow.WIDTH ||
                 this.getCharacter().getTranslateY() < 0 || this.getCharacter().getTranslateY() > GameWindow.HEIGHT) {
             // Remove the projectile from the game window
-            //this.Alive=false;
+            this.Alive=false;
             return true;
         }
         return false;

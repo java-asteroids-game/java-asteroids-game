@@ -7,13 +7,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Point2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -31,7 +26,23 @@ public class GameWindow{
     int count_aliens = 0;
     int framesSinceLastShot = 0;
 
-    ScoreManager scoreManager = new ScoreManager();
+    public void updatePoints(AtomicInteger points, AtomicInteger HP, AtomicInteger level, List<Asteroid> asteroids)  {
+        points.set(points.get() + 100);
+
+        if (points.get() % 1000==0) {
+            HP.set(HP.get() + 1);
+            level.set(level.get() + 1);
+        }
+        asteroids.forEach(asteroid -> {
+            asteroid.move_speed += (0.01 * level.get());
+        });
+    }
+
+    public void updateGameInformation(AtomicInteger points, AtomicInteger HP, AtomicInteger level, List<Asteroid> asteroids, Text text, Text text1, Text text2){
+        text.setText("Points: " + points);
+        text2.setText("Lives: " + HP);
+        text1.setText("Level: " + level);
+    }
 
 
     public void load(Stage stage, int numAsteroids){
@@ -89,7 +100,7 @@ public class GameWindow{
 
 
         List<Asteroid> asteroids = new ArrayList<>();
-        double l =0.1;
+        double l = 0.1;
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd= new Random();
             double rnd_1= Math.random()*10+30;
@@ -198,185 +209,116 @@ public class GameWindow{
                         }
                     });
                     //pressedKeys.clear();
-
                 }
 
                 ship.move();
                 alienShip.move();
-                asteroids.forEach(asteroid -> asteroid.move());
-
-                /*
-                // shooting
-                shoots.forEach(shoot -> {
-                    if(shoot.outOfBounds()) {
-                        shoots.remove(shoot);
-                    }else{shoot.move();}
+                asteroids.forEach(asteroid -> {
+                    asteroid.move();
                 });
-                 */
+
+
+                // -------------------------------------- MANAGE BULLET COLLISIONS WITH ASTEROIDS --------------------------------------------------
+                List<Asteroid> destroyedAsteroids = new ArrayList<>();
+
                 //iterator required to avoid concurrent modification exception (removing item from list while iterating through it)
-                Iterator<Projectile> iterator = shoots.iterator();
-                while(iterator.hasNext()) {
-                    Projectile shoot = iterator.next();
-                    if(shoot.outOfBounds()) {
-                        iterator.remove();
+                Iterator<Projectile> projectileIterator = shoots.iterator();
+                while (projectileIterator.hasNext()) {
+                    Projectile shoot = projectileIterator.next();
+
+                    // Check if the projectile has gone out of bounds
+                    if (shoot.outOfBounds()) {
+                        projectileIterator.remove();
+                        pane.getChildren().remove(shoot.getCharacter());
+                    // else update the position of the projectile
                     } else {
                         shoot.move();
+
+                        // Create a list of broken asteroids
+                        destroyedAsteroids = asteroids.stream()
+                                .filter(asteroid -> asteroid.collide(shoot))
+                                .toList();
+
+                        // If any asteroids have been hit by a projectile, remove them
+                        if (!destroyedAsteroids.isEmpty()) {
+                            destroyedAsteroids.forEach(asteroid -> {
+                                asteroids.remove(asteroid);
+                                pane.getChildren().remove(asteroid.getCharacter());
+
+                                // Define asteroid functionality on destroy
+                                for (int i = 0; i < 2; i++) {
+                                    if (asteroid.getSize() > 10) {
+                                        Asteroid newAsteroid = new Asteroid((int) asteroid.getCharacter().getTranslateX(),
+                                                (int) asteroid.getCharacter().getTranslateY(), asteroid.getSize() * scale, l + 0.2);
+                                        asteroids.add(newAsteroid);
+                                        pane.getChildren().add(newAsteroid.getCharacter());
+                                    }
+                                }
+                            });
+
+                            // Handle points update
+                            updatePoints(points, HP, level, asteroids);
+
+                            // Remove the projectile that collided with the asteroid
+                            projectileIterator.remove();
+                            pane.getChildren().remove(shoot.getCharacter());
+                        }
                     }
                 }
 
-                List<Projectile> destroy_asteroid = shoots.stream().filter(shot -> {
-                    List<Asteroid> destroy = asteroids.stream()
-                            .filter(asteroids -> asteroids.collide(shot))
-                            .toList();
-                    if (destroy.isEmpty()) {
-                        return false;
-                    }
-                    // Remove destroyed asteroid
-                    destroy.forEach(delete -> {
-                        asteroids.remove(delete);
-                        pane.getChildren().remove(delete.getCharacter());
-                        for (int i = 0; i < 2 ; i++) {
-                            if (delete.getSize()>10){
-                                Asteroid asteroid = new Asteroid((int) delete.getCharacter()
-                                        .getTranslateX(),(int)delete.getCharacter().getTranslateY(),delete.getSize()*scale,l + 0.2);
-                                asteroids.add(asteroid);
 
-                                pane.getChildren().add(asteroid.getCharacter());
-                            }
-                        }
-                        // Count Level up
-                    });
-                    return true;
-                }).toList();
-
-                // Add points,HP and level
-                destroy_asteroid.forEach(shot -> {
-                    pane.getChildren().remove(shot.getCharacter());
-                    shoots.remove(shot);
-                    points.set(points.get()+100);
-                    if(points.get()%1000==0){
-
-                        HP.set(HP.get() + 1);
-                        text2.setText("Lives: " + HP);
-
-                        level.set(level.get() + 1);
-                        text1.setText("Level: " + level);
-                        asteroids.forEach(asteroid -> {
-                            asteroid.move_speed+= (0.01 * level.get());
-                        });
-                    }
-                    text.setText("Points: " + points);
-
-                });
-
+                // ------------------------------------ MANAGE ASTEROIDS ON SCREEN -------------------------------------------
                 if (asteroids.isEmpty()) {
+
                     int newNumAsteroids = numAsteroids + 1;
                     double newScale = scale + 0.1;
                     for (int i = 0; i < newNumAsteroids; i++) {
+
                         Random rnd= new Random();
                         double rnd_1= Math.random()*10+30;
+
                         Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),rnd_1,newScale);
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
                     }
+
                     level.incrementAndGet();
                     text1.setText("Level: " + level.get());
                 }
 
+                // ---------------------------------  DEFINE HYPERSPACE ---------------------------------------------------
+
                 // Hyper jumps and random reborn position
                 double random_x = Math.random() * 1000 % WIDTH;
                 double random_y = Math.random() * 700 % HEIGHT;
-                asteroids.forEach(asteroid -> asteroid.move());
+
+
+                // -------------------------------- MANAGE SHIP AND ASTEROID COLLISION ----------------------------------
                 asteroids.forEach(asteroid -> {
+                    // If the ship collides with an asteroid
                     if (ship.collide(asteroid)) {
-                        HP.set(HP.get() - 1);
-                        if(HP.get()>0) {
+                        // Reduce ship HP
+                        HP.decrementAndGet();
+
+                        if (HP.get() > 0) {
+
                             //get children method to add a shape
                             ship.character.setTranslateX((double) WIDTH / 2);
-                            ship.character.setTranslateY(500);
-                            while(asteroid.collide(ship))
-                            {
+                            ship.character.setTranslateY((double) HEIGHT / 2);
+
+                            while(!isPositionSafe(new Point2D(Math.random()*WIDTH, Math.random()*HEIGHT), ship, asteroids, shoots, alienShip, 10)){
                                 ship.character.setTranslateX(Math.random()*WIDTH);
                                 ship.character.setTranslateY(Math.random()*HEIGHT);
                             }
                             text2.setText("Lives: " + HP);
-                        }else
+                        }
+                        else
                         {
                             stop();
-                            text2.setText("GameOver");
-
-                            if (HP.get() == 0){
-                                //DISPLAYING GAME OVER (suggestion: change this to it's own method?)
-                                // Clear all game elements from the root pane
-                                pane.getChildren().clear();
-
-                                // Create a black-colored pane to cover the entire screen
-                                StackPane gameOverPane = new StackPane();
-                                gameOverPane.setStyle("-fx-background-color: black;");
-//                                gameOverPane.setOpacity(0.0); // Set initial opacity to 0
-
-                                // Create a VBox to hold the label and TextField
-                                VBox gameOverContainer = new VBox();
-                                gameOverContainer.setSpacing(20); // Add some space between label and TextField
-
-
-                                // Create a "Game Over" label
-                                Label gameOverLabel = new Label("GAME OVER");
-                                gameOverLabel.setStyle("-fx-font-size: 65;");
-                                gameOverLabel.setTextFill(Color.WHITE);
-
-                                // Create a TextField for user input
-                                TextField playerNameField = new TextField();
-                                playerNameField.setPromptText("Enter your name");
-                                playerNameField.setStyle("-fx-font-size: 30; " +
-                                        "-fx-text-fill: white; " +
-                                        "-fx-background-color: black; " +
-                                        "-fx-border-color: transparent; " +
-                                        "-fx-border-width: 0;");
-                                playerNameField.setMaxWidth(300);
-
-                                // Add listener to detect when the user has pressed enter
-                                playerNameField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                                    if (event.getCode() == KeyCode.ENTER) {
-                                        String playerName = playerNameField.getText().trim();
-                                        if (!playerName.isEmpty()) {
-                                            // Call the ScoreManager.appendScore() method
-                                            scoreManager.appendScoreToFile(playerName, points);
-
-                                            // Hide the input box
-                                            playerNameField.setVisible(false);
-
-                                            // Display the list of high scores
-                                            Stage stage = new Stage(); // Create a new Stage instance
-                                            com.example.javaproject.Pane.getInstance().scorelist(stage);
-
-                                        }
-                                    }
-                                });
-
-
-                                // Add the "Game Over" label to the pane
-                                gameOverContainer.getChildren().addAll(gameOverLabel, playerNameField);
-
-                                // Add the VBox to the pane
-                                gameOverPane.getChildren().add(gameOverContainer);
-
-//                                 Animate the pane by changing its opacity from 0 to 1 and back to 0 repeatedly
-                                Timeline animation = new Timeline(
-                                        new KeyFrame(Duration.seconds(0), event -> gameOverPane.setOpacity(0.0)),
-                                        new KeyFrame(Duration.seconds(0.5), event -> gameOverPane.setOpacity(1.0)),
-                                        new KeyFrame(Duration.seconds(1), event -> gameOverPane.setOpacity(0.0))
-                                );
-
-                                animation.setCycleCount(3);
-                                animation.play();
-
-                                // Add the game over pane to the root pane
-                                pane.getChildren().add(gameOverPane);
-                                gameOverPane.setTranslateX((pane.getWidth() - gameOverPane.getWidth()) / 2.8);
-                                gameOverPane.setTranslateY((pane.getHeight() - gameOverPane.getHeight()) / 2.5);
-
-                            }
+                            pane.getChildren().clear();
+                            int finalPoints = points.get();
+                            Scene gameOverScene = new GameOver().showGameOverScreen(finalPoints);
+                            stage.setScene(gameOverScene);
                         }
                     }
                 });
@@ -391,7 +333,10 @@ public class GameWindow{
                         pane.getChildren().add(asteroid.getCharacter());
                     }
                 }
+
+                updateGameInformation(points, HP, level, asteroids, text, text1, text2);
             }
+
 
         }.start();
 
@@ -402,9 +347,10 @@ public class GameWindow{
         stage.show();
     }
 
+
+
     //Determine if the location is safe
-    public boolean isPositionSafe(double x, double y, PlayerShip player, List<Asteroid> asteroids, List<Projectile> projectiles, List<EnemyShip> aliens, double safeDistance) {
-        Point2D newPosition = new Point2D(x, y);
+    public boolean isPositionSafe(Point2D newPosition, PlayerShip player, List<Asteroid> asteroids, List<Projectile> projectiles, EnemyShip alien, double safeDistance) {
 
         // Check for collisions with asteroids
         for (Asteroid asteroid : asteroids) {
@@ -420,12 +366,11 @@ public class GameWindow{
             }
         }
 
-        // Check for collisions with alien ships
-        for (EnemyShip  alien : aliens) {
-            if (newPosition.distance(alien.getCharacter().getTranslateX(), alien.getCharacter().getTranslateY()) < safeDistance) {
-                return false;
-            }
+        // Check for collisions with alien ship
+        if (newPosition.distance(alien.getCharacter().getTranslateX(), alien.getCharacter().getTranslateY()) < safeDistance) {
+            return false;
         }
+
 
         return true;
     }

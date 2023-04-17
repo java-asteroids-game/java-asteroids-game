@@ -55,4 +55,5 @@ public class ScoreWindow {
             stage.show(); // Display the Stage
 
     }
+
 }
