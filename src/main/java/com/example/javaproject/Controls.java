@@ -27,7 +27,7 @@ public class Controls {
         titleText.setOpacity(.4);
         pane1.getChildren().add(titleText);
 
-        Text controlText = new Text((WIDTH/2 -180), 440, "W: Accelerate  A:Turn Left  D: Turn Right");
+        Text controlText = new Text((WIDTH/2 -280), 440, "W / UP: Accelerate     A / LEFT :Turn Left     D / RIGHT: Turn Right");
         controlText.setFill(Color.WHITE);
         controlText.setStyle("-fx-font: 20 arial;");
         controlText.setOpacity(.4);
@@ -91,15 +91,15 @@ public class Controls {
                     pane1.getChildren().add(asteroid.getCharacter());
                     }
 
-                if (pressedKeys.getOrDefault(KeyCode.A, false) && !pressedKeys.getOrDefault(KeyCode.RIGHT, false)) {
+                if ((pressedKeys.getOrDefault(KeyCode.A, false)||pressedKeys.getOrDefault(KeyCode.LEFT, false))&& !pressedKeys.getOrDefault(KeyCode.D, false)&& !pressedKeys.getOrDefault(KeyCode.RIGHT, false)) {
                     ship.turnLeft();
                 }
 
-                if (pressedKeys.getOrDefault(KeyCode.D, false) && !pressedKeys.getOrDefault(KeyCode.LEFT, false)) {
+                if ((pressedKeys.getOrDefault(KeyCode.D, false)||pressedKeys.getOrDefault(KeyCode.RIGHT, false))&& !pressedKeys.getOrDefault(KeyCode.A, false)&& !pressedKeys.getOrDefault(KeyCode.LEFT, false)) {
                     ship.turnRight();
                 }
 
-                if (pressedKeys.getOrDefault(KeyCode.W, false)) {
+                if (pressedKeys.getOrDefault(KeyCode.W, false)||pressedKeys.getOrDefault(KeyCode.UP, false)) {
                     ship.accelerate();
                 }
 
@@ -107,12 +107,14 @@ public class Controls {
                         && pressedKeys.getOrDefault(KeyCode.SPACE, false);
 
                 //can use an or operator here, as logically if moveAndShootPressed is true, then Space must be pressed
-                if (pressedKeys.getOrDefault(KeyCode.SPACE, false) || moveAndShootPressed) {
+                if ((pressedKeys.getOrDefault(KeyCode.SPACE, false) || moveAndShootPressed) && shoots.size()<=6) {
                     // Check if enough frames have passed since the last shot
                     if (framesSinceLastShot >= 16) {
                         // When shooting the bullet in the same direction as the ship
                         Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
                                 (int) ship.getCharacter().getTranslateY());
+
+                        shot.setSpeed(ship.getSpeed());
 
                         shot.getCharacter().setRotate(ship.getCharacter().getRotate());
                         shoots.add(shot);
