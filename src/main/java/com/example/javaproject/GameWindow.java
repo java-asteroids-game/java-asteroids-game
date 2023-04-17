@@ -10,7 +10,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyCode;
@@ -216,7 +215,7 @@ public class GameWindow {
             }
 
             private void handleShipShooting() {
-                if (framesSinceLastShot >= 15 && shoots.size() < 8) {
+                if (framesSinceLastShot >= 15 && shoots.size() < 6) {
                     // When shooting the bullet in the same direction as the ship
                     Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
                             (int) ship.getCharacter().getTranslateY());
