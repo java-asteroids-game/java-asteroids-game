@@ -37,8 +37,8 @@ public class EnemyShip extends AbstractGameElement {
         // Change direction every 4 seconds
         if (currentTime - createdTime > 4000) {
             double angle = Math.random() * 2 * Math.PI;
-            changeX = Math.cos(angle) * (Math.random() * 2 + 2);
-            changeY = Math.sin(angle) * (Math.random() * 2 + 2);
+            changeX = Math.cos(angle) * (Math.random() * 2 );
+            changeY = Math.sin(angle) * (Math.random() * 2 );
             this.movement = new Point2D(changeX, changeY);
             setCreatedTime(currentTime);
         }
