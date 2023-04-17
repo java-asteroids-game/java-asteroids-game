@@ -7,21 +7,22 @@ import java.util.Random;
 
 public class Asteroid<move_speed> extends AbstractGameElement {
     public double move_speed;
+    private AsteroidType type;
     public double rotationalMovement;
     public int x;
     public int y;
     public double size;
 
 
-        public Asteroid(int x, int y, double s, double l) {
+        public Asteroid(int x, int y, /*double s,*/ double l, AsteroidType type) {
 
-            super(new Polygon(s, 0.0, s * Math.cos(Math.PI * 2 / 5), -1 * s * Math.sin(Math.PI * 2 / 5),
-                            -1 * s * Math.cos(Math.PI / 5), -1 * s * Math.sin(Math.PI * 4 / 5),
-                            -1 * s * Math.cos(Math.PI / 5), s * Math.sin(Math.PI * 4 / 5),
-                            s * Math.cos(Math.PI * 2 / 5), s * Math.sin(Math.PI * 2 / 5)),
+            super(new Polygon(type.getSize(), 0.0, type.getSize() * Math.cos(Math.PI * 2 / 5), -1 * type.getSize() * Math.sin(Math.PI * 2 / 5),
+                            -1 * type.getSize() * Math.cos(Math.PI / 5), -1 * type.getSize() * Math.sin(Math.PI * 4 / 5),
+                            -1 * type.getSize() * Math.cos(Math.PI / 5), type.getSize() * Math.sin(Math.PI * 4 / 5),
+                            type.getSize() * Math.cos(Math.PI * 2 / 5), type.getSize() * Math.sin(Math.PI * 2 / 5)),
                     x, y);
             Random rnd = new Random();
-            this.size = s;
+            this.type = type;
             this.move_speed = l;
 
             super.getCharacter().setRotate(rnd.nextInt(360));
@@ -50,16 +51,24 @@ public class Asteroid<move_speed> extends AbstractGameElement {
 
         wrapScreen();
     }
+
+    /*
     public double getSize(){
         return this.size;
     }
+     */
     public double Move_speed_up(){
         this.move_speed=0.05;
         return this.move_speed;
     }
 
-        public boolean collide(AbstractGameElement other) {
-            Shape collisionArea = Shape.intersect(this.character, other.getCharacter());
-            return collisionArea.getBoundsInLocal().getWidth() != -1;
-        }
+    public AsteroidType getType(){
+        return this.type;
     }
+
+    public boolean collide(AbstractGameElement other) {
+        Shape collisionArea = Shape.intersect(this.character, other.getCharacter());
+        return collisionArea.getBoundsInLocal().getWidth() != -1;
+    }
+
+}

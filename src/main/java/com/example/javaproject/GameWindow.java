@@ -100,12 +100,12 @@ public class GameWindow{
         double l=0.01;
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd= new Random();
-            double rnd_1= Math.random()*10+30;
-            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),rnd_1,l);
+            double rnd_1= Math.random()*25+30;
+            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),/*25,*/0.1, AsteroidType.LARGE);
             asteroids.add(asteroid);
         }
         double scale=0.5;
-        Asteroid asteroid_special=new Asteroid(WIDTH/2,500,40,l);
+        Asteroid asteroid_special=new Asteroid(WIDTH/2,500,/*40,*/0.1, AsteroidType.SPECIAL);
         asteroids.add(asteroid_special);
 
         asteroids.forEach(asteroid -> pane.getChildren().add(asteroid.getCharacter()));
@@ -176,7 +176,7 @@ public class GameWindow{
                 //can use an or operator here, as logically if moveAndShootPressed is true, then Space must be pressed
                 if (pressedKeys.getOrDefault(KeyCode.SPACE, false) || moveAndShootPressed) {
                     // Check if enough frames have passed since the last shot
-                    if (framesSinceLastShot >= 10) {
+                    if (framesSinceLastShot >= 12) {
                         // When shooting the bullet in the same direction as the ship
                         Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
                                 (int) ship.getCharacter().getTranslateY());
@@ -227,6 +227,7 @@ public class GameWindow{
                     Projectile shoot = iterator.next();
                     if(shoot.outOfBounds()) {
                         iterator.remove();
+                        pane.getChildren().remove(shoot.getCharacter());
                     } else {
                         shoot.move();
                     }
@@ -244,11 +245,21 @@ public class GameWindow{
                         asteroids.remove(delete);
                         pane.getChildren().remove(delete.getCharacter());
                         for (int i = 0; i < 2 ; i++) {
-                            if (delete.getSize()>10){
+                            if (delete.getType()== AsteroidType.SPECIAL){
                                 Asteroid asteroid = new Asteroid((int) delete.getCharacter()
-                                        .getTranslateX(),(int)delete.getCharacter().getTranslateY(),delete.getSize()*scale,l + 0.2);
+                                        .getTranslateX(),(int)delete.getCharacter().getTranslateY(),/*25,*/l + 0.2, AsteroidType.LARGE);
                                 asteroids.add(asteroid);
-
+                                pane.getChildren().add(asteroid.getCharacter());
+                            }
+                            else if (delete.getType() == AsteroidType.LARGE){
+                                Asteroid asteroid = new Asteroid((int) delete.getCharacter()
+                                        .getTranslateX(),(int)delete.getCharacter().getTranslateY(),/*25,*/l + 0.2, AsteroidType.MEDIUM);
+                                asteroids.add(asteroid);
+                                pane.getChildren().add(asteroid.getCharacter());
+                            }else if (delete.getType() == AsteroidType.MEDIUM){
+                                Asteroid asteroid = new Asteroid((int) delete.getCharacter()
+                                        .getTranslateX(),(int)delete.getCharacter().getTranslateY(),/*12,*/l + 0.2, AsteroidType.SMALL);
+                                asteroids.add(asteroid);
                                 pane.getChildren().add(asteroid.getCharacter());
                             }
                         }
@@ -283,7 +294,7 @@ public class GameWindow{
                     for (int i = 0; i < newNumAsteroids; i++) {
                         Random rnd= new Random();
                         double rnd_1= Math.random()*10+30;
-                        Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),rnd_1,newScale);
+                        Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),/*35,*/newScale, AsteroidType.LARGE);
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
                     }
@@ -393,7 +404,7 @@ public class GameWindow{
                 if(Math.random() < 0.005) {
                     double rnd_2= Math.random()*10+30;
                     double rnd_3=Math.random()*1000;
-                    Asteroid asteroid = new Asteroid((int) rnd_3%WIDTH, 0,rnd_2,l+0.3*level.get());
+                    Asteroid asteroid = new Asteroid((int) rnd_3%WIDTH, 0,/*25,*/l+0.3*level.get(), AsteroidType.MEDIUM);
                     if(!asteroid.collide(ship)) {
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
