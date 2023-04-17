@@ -67,7 +67,7 @@ public class GameOver {
         playerNameField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                     displayHighScores(playerNameField);
-//                    ScoreWindow.load(stage);
+                    ScoreWindow.load(stage);
             }
         });
 

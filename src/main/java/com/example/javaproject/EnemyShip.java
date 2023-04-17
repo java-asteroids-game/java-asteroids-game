@@ -35,6 +35,7 @@ public class EnemyShip extends AbstractGameElement {
         long currentTime = currentTimeMillis();
         long createdTime = this.getCreatedTime();
 
+        // Change direction every 4 seconds
         if (currentTime - createdTime > 4000) {
             double angle = Math.random() * 2 * Math.PI;
             changeX = Math.cos(angle) * (Math.random() * 2 + 2);
@@ -53,17 +54,20 @@ public class EnemyShip extends AbstractGameElement {
     }
 
 
-    public Projectile shootAtTarget(PlayerShip target){
+    public Projectile shootAtTarget(PlayerShip target) {
         // Set location to enemy ship location
         Projectile projectile = new Projectile((int) this.getCharacter().getTranslateX(), (int) this.getCharacter().getTranslateY());
-        // Get direction to playership
-        Point2D direction = new Point2D(target.getCharacter().getTranslateX() - projectile.getCharacter().getTranslateX(),
-                target.getCharacter().getTranslateY() - projectile.getCharacter().getTranslateY());
 
-        projectile.setMovement(direction.normalize().multiply(2));
+        // Calculate angle between alien ship and target ship
+        double angle = Math.toDegrees(Math.atan2(target.getCharacter().getTranslateY() - projectile.getCharacter().getTranslateY(),
+                target.getCharacter().getTranslateX() - projectile.getCharacter().getTranslateX()));
+
+        // Set the rotation of the projectile
+        projectile.getCharacter().setRotate(angle);
 
         return projectile;
     }
+
 
 
 
