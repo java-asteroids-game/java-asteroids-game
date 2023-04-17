@@ -185,7 +185,7 @@ public class GameWindow {
             }
 
             private void handleShipShooting() {
-                if (framesSinceLastShot >= 15) {
+                if (framesSinceLastShot >= 15 && shoots.size() < 6) {
                     // When shooting the bullet in the same direction as the ship
                     Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
                             (int) ship.getCharacter().getTranslateY());
