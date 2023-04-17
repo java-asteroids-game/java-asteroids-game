@@ -317,7 +317,7 @@ public class GameWindow{
                             stop();
                             pane.getChildren().clear();
                             int finalPoints = points.get();
-                            Scene gameOverScene = new GameOver().showGameOverScreen(finalPoints);
+                            Scene gameOverScene = new GameOver().showGameOverScreen(stage, finalPoints);
                             stage.setScene(gameOverScene);
                         }
                     }
