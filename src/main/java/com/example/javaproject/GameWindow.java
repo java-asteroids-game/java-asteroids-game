@@ -38,7 +38,7 @@ public class GameWindow {
     final EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2);
 
 
-    public void asteroidsHitUpdatePoints(AtomicInteger points, AtomicInteger HP, AtomicInteger level, List<Asteroid> asteroids) {
+    public void asteroidsHitUpdatePoints() {
         points.set(points.get() + 100);
 
         if (points.get() % 1000 == 0) {
@@ -292,10 +292,6 @@ public class GameWindow {
                     }
                 });
 
-                //if numAsteroids <15 && numFramesSinceRandomAsteroid > 10
-                //Recreate random position asteroids
-
-                //if (Math.random() < 0.005) {
                 if(framesSinceLastRandomAsteroid >10 && Math.random() < 0.005){
                     double rnd_2 = Math.random() * 1000;
                     Asteroid asteroid = new Asteroid((int) rnd_2 % WIDTH, 0, l, AsteroidType.MEDIUM);
@@ -364,7 +360,7 @@ public class GameWindow {
                             });
 
                             // Handle points update
-                            asteroidsHitUpdatePoints(points, HP, level, asteroids);
+                            asteroidsHitUpdatePoints();
 
                             // Remove the projectile that collided with the asteroid
                             projectileIterator.remove();

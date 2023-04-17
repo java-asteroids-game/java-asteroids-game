@@ -16,7 +16,7 @@ import javafx.util.Duration;
 
 public class GameOver {
     int points;
-    ScoreManager scoreManager;
+    ScoreManager scoreManager ;
 
     public GameOver() {
         // Initialize the ScoreManager instance
