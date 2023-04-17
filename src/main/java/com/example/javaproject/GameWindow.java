@@ -105,7 +105,7 @@ public class GameWindow{
             asteroids.add(asteroid);
         }
         double scale=0.5;
-        Asteroid asteroid_special=new Asteroid(WIDTH/2,500,/*40,*/0.1, AsteroidType.SPECIAL);
+        Asteroid asteroid_special=new Asteroid(WIDTH/2,500,40,l);
         asteroids.add(asteroid_special);
 
         asteroids.forEach(asteroid -> pane.getChildren().add(asteroid.getCharacter()));
@@ -176,7 +176,7 @@ public class GameWindow{
                 //can use an or operator here, as logically if moveAndShootPressed is true, then Space must be pressed
                 if (pressedKeys.getOrDefault(KeyCode.SPACE, false) || moveAndShootPressed) {
                     // Check if enough frames have passed since the last shot
-                    if (framesSinceLastShot >= 12) {
+                    if (framesSinceLastShot >= 10) {
                         // When shooting the bullet in the same direction as the ship
                         Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
                                 (int) ship.getCharacter().getTranslateY());
@@ -404,7 +404,7 @@ public class GameWindow{
                 if(Math.random() < 0.005) {
                     double rnd_2= Math.random()*10+30;
                     double rnd_3=Math.random()*1000;
-                    Asteroid asteroid = new Asteroid((int) rnd_3%WIDTH, 0,/*25,*/l+0.3*level.get(), AsteroidType.MEDIUM);
+                    Asteroid asteroid = new Asteroid((int) rnd_3%WIDTH, 0,rnd_2,l+0.3*level.get());
                     if(!asteroid.collide(ship)) {
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());

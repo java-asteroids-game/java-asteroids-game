@@ -11,6 +11,7 @@ public class EnemyShip extends AbstractGameElement {
     public double speed;
     private double changeX = Math.random() * 2 + 2;
     private double changeY = Math.random() * 2 + 2;
+    private boolean alive = false;
 
     //creates a green polygon
     public EnemyShip(int x, int y) {
@@ -69,5 +70,13 @@ public class EnemyShip extends AbstractGameElement {
     public boolean collide(AbstractGameElement other) {
         Shape collisionArea = Shape.intersect(this.character, other.getCharacter());
         return collisionArea.getBoundsInLocal().getWidth() != -1;
+    }
+
+    public boolean isAlive(){
+        return this.alive;
+    }
+
+    public void setAlive(boolean alive){
+        this.alive = alive;
     }
 }

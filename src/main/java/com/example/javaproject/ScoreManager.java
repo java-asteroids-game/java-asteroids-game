@@ -2,14 +2,16 @@
 package com.example.javaproject;
 
 import java.io.*;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ScoreManager {
         private int score;
 
         // Method to append score to a local file
-        public void appendScoreToFile(String name, AtomicInteger score) {
+        public void appendScoreToFile(String name, int score) {
             String fileName = "scores.txt"; // Update the file name
             try {
                 FileWriter fileWriter = new FileWriter(fileName, true);

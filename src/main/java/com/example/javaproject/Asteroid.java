@@ -5,7 +5,7 @@ import javafx.scene.shape.Shape;
 
 import java.util.Random;
 
-public class Asteroid<move_speed> extends AbstractGameElement {
+public class Asteroid extends AbstractGameElement {
     public double move_speed;
     private AsteroidType type;
     public double rotationalMovement;

@@ -18,7 +18,7 @@ public class ScoreWindow {
     public static final int HEIGHT = 400;
 
     public static void load(Stage stage) {
-        javafx.scene.layout.Pane pane = new Pane();
+        Pane pane = new Pane();
         pane.setPrefSize(WIDTH, HEIGHT);
         pane.setStyle("-fx-background-color: black");
 
@@ -54,5 +54,8 @@ public class ScoreWindow {
             stage.setTitle("High Score!!!"); // Set the title of the window
             stage.show(); // Display the Stage
 
+
+
     }
+
 }
