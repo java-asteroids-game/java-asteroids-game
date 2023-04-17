@@ -31,8 +31,8 @@ public class GameWindow {
     int framesSinceLastAlienShot = 0;
     int framesSinceLastRandomAsteroid = 0;
 
-    List<Asteroid> asteroids = new LinkedList<>();
-    List<Projectile> shoots = new ArrayList<>();
+    List<Asteroid> asteroids = new ArrayList<>();
+    List<Projectile> shoots = new LinkedList<>();
     List<Projectile> alienShoots = new ArrayList<>();
     PlayerShip ship = new PlayerShip(WIDTH / 2, HEIGHT / 2);
     final EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2);
@@ -42,7 +42,7 @@ public class GameWindow {
         points.set(points.get() + 100);
 
         if (points.get() % 1000 == 0) {
-            HP.set(HP.get() + 1);
+            HP.incrementAndGet();
             level.incrementAndGet();
         }
     }
@@ -185,7 +185,7 @@ public class GameWindow {
             }
 
             private void handleShipShooting() {
-                if (framesSinceLastShot >= 15) {
+                if (framesSinceLastShot >= 15 && shoots.size() < 6) {
                     // When shooting the bullet in the same direction as the ship
                     Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
                             (int) ship.getCharacter().getTranslateY());
@@ -232,8 +232,8 @@ public class GameWindow {
             private void moveObjects() {
                 ship.move();
                 alienShip.move();
-                handleAlienShooting();
                 asteroids.forEach(asteroid -> asteroid.move());
+                handleAlienShooting();
             }
 
             private void damageShip() {
@@ -349,8 +349,6 @@ public class GameWindow {
                     }
                     framesSinceLastRandomAsteroid = 0;
                 }
-
-
 
                 updateGameInformation(pointsText, levelText, livesText);
                 framesSinceLastRandomAsteroid++;
