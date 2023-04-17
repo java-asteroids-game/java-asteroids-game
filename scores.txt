@@ -24,3 +24,6 @@ Tania	3700
 sasd	100
 Tania	1300
 TaniaTANIA	0
+Conor	3900
+Conor	300
+Conor	5000

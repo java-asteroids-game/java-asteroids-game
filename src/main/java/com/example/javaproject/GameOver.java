@@ -15,15 +15,22 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class GameOver {
-
-    ScoreManager scoreManager = new ScoreManager();
     int points;
+    ScoreManager scoreManager;
 
+    public GameOver() {
+        // Initialize the ScoreManager instance
+        scoreManager = new ScoreManager();
+    }
 
     public void displayHighScores(TextField playerNameField){
+
+
+
         String playerName = playerNameField.getText().trim();
 
         if (!playerName.isEmpty()) {
+
             // Call the ScoreManager.appendScore() method
             scoreManager.appendScoreToFile(playerName, this.points);
             // Hide the input box
@@ -66,6 +73,7 @@ public class GameOver {
         // Add listener to detect when the user has pressed enter
         playerNameField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
+                displayHighScores(playerNameField);
                 Scene highScoresScene = new ScoreWindow().showHighScoresScreen(stage);
                 stage.setScene(highScoresScene);
             }
@@ -88,7 +96,7 @@ public class GameOver {
         animation.play();
 
         return new Scene(gameOverPane);
-        }
+    }
 
 
 
