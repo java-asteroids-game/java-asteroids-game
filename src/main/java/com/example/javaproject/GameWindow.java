@@ -5,6 +5,7 @@ package com.example.javaproject;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -30,7 +31,25 @@ public class GameWindow{
     int count_aliens = 0;
     int framesSinceLastShot = 0;
 
-    ScoreManager scoreManager = new ScoreManager();
+    //ScoreManager scoreManager = new ScoreManager();
+
+    public void updatePoints(AtomicInteger points, AtomicInteger HP, AtomicInteger level, List<Asteroid> asteroids)  {
+        points.set(points.get() + 100);
+
+        if (points.get() % 1000==0) {
+            HP.set(HP.get() + 1);
+            level.set(level.get() + 1);
+        }
+        asteroids.forEach(asteroid -> {
+            asteroid.move_speed += (0.01 * level.get());
+        });
+    }
+
+    public void updateGameInformation(AtomicInteger points, AtomicInteger HP, AtomicInteger level, List<Asteroid> asteroids, Text text, Text text1, Text text2){
+        text.setText("Points: " + points);
+        text2.setText("Lives: " + HP);
+        text1.setText("Level: " + level);
+    }
 
 
     public void load(Stage stage, int numAsteroids){
@@ -97,7 +116,7 @@ public class GameWindow{
 
 
         List<Asteroid> asteroids = new ArrayList<>();
-        double l=0.01;
+        double l=0.1;
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd= new Random();
             double rnd_1= Math.random()*25+30;
@@ -105,7 +124,7 @@ public class GameWindow{
             asteroids.add(asteroid);
         }
         double scale=0.5;
-        Asteroid asteroid_special=new Asteroid(WIDTH/2,500,40,l);
+        Asteroid asteroid_special=new Asteroid(WIDTH/2,500,.4,AsteroidType.SPECIAL);
         asteroids.add(asteroid_special);
 
         asteroids.forEach(asteroid -> pane.getChildren().add(asteroid.getCharacter()));
@@ -308,6 +327,8 @@ public class GameWindow{
                 asteroids.forEach(asteroid -> asteroid.move());
                 asteroids.forEach(asteroid -> {
                     if (ship.collide(asteroid)) {
+                        Point2D point = new Point2D(0, 0);
+                        ship.setMovement(point);
                         HP.set(HP.get() - 1);
                         if(HP.get()>0) {
                             //get children method to add a shape
@@ -360,7 +381,7 @@ public class GameWindow{
                                         String playerName = playerNameField.getText().trim();
                                         if (!playerName.isEmpty()) {
                                             // Call the ScoreManager.appendScore() method
-                                            scoreManager.appendScoreToFile(playerName, points);
+                                            //scoreManager.appendScoreToFile(playerName, points);
 
                                             // Hide the input box
                                             playerNameField.setVisible(false);
@@ -404,7 +425,7 @@ public class GameWindow{
                 if(Math.random() < 0.005) {
                     double rnd_2= Math.random()*10+30;
                     double rnd_3=Math.random()*1000;
-                    Asteroid asteroid = new Asteroid((int) rnd_3%WIDTH, 0,rnd_2,l+0.3*level.get());
+                    Asteroid asteroid = new Asteroid((int) rnd_3%WIDTH, 0,l,AsteroidType.MEDIUM);
                     if(!asteroid.collide(ship)) {
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
