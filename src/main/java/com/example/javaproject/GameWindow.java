@@ -21,9 +21,6 @@ public class GameWindow{
     //game window size
     public static final int WIDTH = 960;
     public static final int HEIGHT = 600;
-    public static int MAX_ALIENS = 2;
-    public int MAX_GENERATE_ALIENS = 3;
-    int count_aliens = 0;
     int framesSinceLastShot = 0;
     int framesSinceLastAlienShot = 0;
 
@@ -77,13 +74,13 @@ public class GameWindow{
         AtomicInteger level = new AtomicInteger(1);
         AtomicInteger HP= new AtomicInteger(3);
 
-        // Creates the generator for the alien. Sets up 2 timeline events to check if the alien is alive and shoot bullets
+        // Creates the generator for the alien. Sets up timeline events to check if the alien is alive
         Timeline alienGenerator = new Timeline();
         alienGenerator.getKeyFrames().add(
                 new KeyFrame(Duration.seconds(10), event -> {
                     if (!alienShip.isAlive()) {
                         alienShip.getCharacter().setTranslateX(Math.random() * WIDTH);
-                        alienShip.getCharacter().setTranslateY(Math.random() * WIDTH);
+                        alienShip.getCharacter().setTranslateY(Math.random() * HEIGHT);
                         pane.getChildren().add(alienShip.getCharacter());
                         alienShip.setAlive(true);
                     }
@@ -99,18 +96,18 @@ public class GameWindow{
         double l = 0.1;
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd= new Random();
-            double rnd_1= Math.random()*10+30;
-            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), rnd_1, l);
+            double rnd_1= Math.random()*25+30;
+            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),/*25,*/0.1, AsteroidType.LARGE);
             asteroids.add(asteroid);
         }
         double scale=0.5;
-        Asteroid asteroid_special=new Asteroid(WIDTH/2,500,40,l);
+        Asteroid asteroid_special=new Asteroid(WIDTH/2,500,.4,AsteroidType.SPECIAL);
         asteroids.add(asteroid_special);
 
         asteroids.forEach(asteroid -> pane.getChildren().add(asteroid.getCharacter()));
 
         List<Projectile> shoots = new ArrayList<>();
-        List<Projectile> alientShoots = new ArrayList<>();
+        List<Projectile> alienShoots = new ArrayList<>();
         //control ship
         Map<KeyCode, Boolean> pressedKeys = new HashMap<>();
         Scene scene = new Scene(pane);
@@ -120,37 +117,6 @@ public class GameWindow{
         scene.setOnKeyReleased(event -> {
             pressedKeys.put(event.getCode(), Boolean.FALSE);
         });
-
-
-//        //alien projectile move
-//        alienProjectiles.forEach(projectile -> projectile.move());
-//        //alien projectiles collide player ship
-//        alienProjectiles.forEach(projectile -> {
-//            if (ship.collide(projectile)) {
-//                HP.set(HP.get() - 1);
-//                if(HP.get()>0) {
-//                    //get Children method to add a shape
-//                    ship.character.setTranslateX((double) WIDTH / 2);
-//                    ship.character.setTranslateY(500);
-//                    while (!isPositionSafe(WIDTH / 2, 500, ship, asteroids, shoots, alienShip , 100));
-//                    text2.setText("HP: " + HP);
-//                }else
-//                {
-//                    text2.setText("GameOver");
-//
-//                }
-//            }
-//        });
-//        //alien projectiles steam, remove dead alien projectiles
-//        List<Projectile> deadAlienProjectiles = alienProjectiles.stream()
-//                .filter(projectile -> !projectile.isAlive())
-//                .toList();
-//
-//        deadAlienProjectiles.forEach(projectile -> {
-//            pane.getChildren().remove(projectile.getCharacter());
-//            alienProjectiles.remove(projectile);
-//        });
-
 
         new AnimationTimer() {
 
@@ -212,7 +178,7 @@ public class GameWindow{
                     if (framesSinceLastAlienShot >= 30){
                         Projectile alienShot = alienShip.shootAtTarget(ship);
 
-                        alientShoots.add(alienShot);
+                        alienShoots.add(alienShot);
                         alienShot.move();
                         pane.getChildren().add(alienShot.getCharacter());
 
@@ -245,7 +211,7 @@ public class GameWindow{
                         shoot.move();
 
 
-                        if (alienShip.collide(shoot)) {
+                        if (alienShip.isAlive() && alienShip.collide(shoot)) {
                             alienShip.setAlive(false);
                             pane.getChildren().remove(alienShip.getCharacter());
                         }
@@ -259,25 +225,25 @@ public class GameWindow{
                         // If any asteroids have been hit by a projectile, remove them
                         if (!destroyedAsteroids.isEmpty()) {
                             destroyedAsteroids.forEach(delete -> {
-                            asteroids.remove(delete);
-                            pane.getChildren().remove(delete.getCharacter());
-                            for (int i = 0; i < 2 ; i++) {
-                                if (delete.getType()== AsteroidType.SPECIAL){
-                                    Asteroid asteroid = new Asteroid((int) delete.getCharacter()
-                                            .getTranslateX(),(int)delete.getCharacter().getTranslateY(),/*25,*/l + 0.2, AsteroidType.LARGE);
-                                    asteroids.add(asteroid);
-                                    pane.getChildren().add(asteroid.getCharacter());
-                                }
-                                else if (delete.getType() == AsteroidType.LARGE){
-                                    Asteroid asteroid = new Asteroid((int) delete.getCharacter()
-                                            .getTranslateX(),(int)delete.getCharacter().getTranslateY(),/*25,*/l + 0.2, AsteroidType.MEDIUM);
-                                    asteroids.add(asteroid);
-                                    pane.getChildren().add(asteroid.getCharacter());
-                                }else if (delete.getType() == AsteroidType.MEDIUM){
-                                    Asteroid asteroid = new Asteroid((int) delete.getCharacter()
-                                            .getTranslateX(),(int)delete.getCharacter().getTranslateY(),/*12,*/l + 0.2, AsteroidType.SMALL);
-                                    asteroids.add(asteroid);
-                                    pane.getChildren().add(asteroid.getCharacter());
+                                asteroids.remove(delete);
+                                pane.getChildren().remove(delete.getCharacter());
+                                for (int i = 0; i < 2 ; i++) {
+                                    if (delete.getType() == AsteroidType.SPECIAL) {
+                                        Asteroid asteroid = new Asteroid((int) delete.getCharacter()
+                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(),/*25,*/l + 0.2, AsteroidType.LARGE);
+                                        asteroids.add(asteroid);
+                                        pane.getChildren().add(asteroid.getCharacter());
+                                    } else if (delete.getType() == AsteroidType.LARGE) {
+                                        Asteroid asteroid = new Asteroid((int) delete.getCharacter()
+                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(),/*25,*/l + 0.2, AsteroidType.MEDIUM);
+                                        asteroids.add(asteroid);
+                                        pane.getChildren().add(asteroid.getCharacter());
+                                    } else if (delete.getType() == AsteroidType.MEDIUM) {
+                                        Asteroid asteroid = new Asteroid((int) delete.getCharacter()
+                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(),/*12,*/l + 0.2, AsteroidType.SMALL);
+                                        asteroids.add(asteroid);
+                                        pane.getChildren().add(asteroid.getCharacter());
+                                    }
                                 }
                             });
 
@@ -293,7 +259,7 @@ public class GameWindow{
 
 
                 //iterator required to avoid concurrent modification exception (removing item from list while iterating through it)
-                Iterator<Projectile> alienProjectileIterator = alientShoots.iterator();
+                Iterator<Projectile> alienProjectileIterator = alienShoots.iterator();
                 while (alienProjectileIterator.hasNext()) {
                     Projectile alienShoot = alienProjectileIterator.next();
 
@@ -303,6 +269,8 @@ public class GameWindow{
                         pane.getChildren().remove(alienShoot.getCharacter());
                         // else update the position of the projectile
                     } else if (alienShoot.collide(ship)) {
+                        alienProjectileIterator.remove();
+                        pane.getChildren().remove(alienShoot.getCharacter());
                         damageShip();
                     } else {
                         alienShoot.move();
@@ -320,7 +288,7 @@ public class GameWindow{
                         Random rnd= new Random();
                         double rnd_1= Math.random()*10+30;
 
-                        Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),rnd_1,newScale);
+                        Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), newScale, AsteroidType.LARGE);
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
                     }
@@ -346,7 +314,7 @@ public class GameWindow{
                 if(Math.random() < 0.005) {
                     double rnd_2= Math.random()*10+30;
                     double rnd_3=Math.random()*1000;
-                    Asteroid asteroid = new Asteroid((int) rnd_3% WIDTH, 0,rnd_2,l+0.3*level.get());
+                    Asteroid asteroid = new Asteroid((int) rnd_3%WIDTH, 0, l, AsteroidType.MEDIUM);
                     if(!asteroid.collide(ship)) {
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
@@ -361,14 +329,14 @@ public class GameWindow{
 
                 if (HP.get() > 0) {
                     //get children method to add a shape
-                    ship.character.setTranslateX((double) WIDTH / 2);
-                    ship.character.setTranslateY((double) HEIGHT / 2);
-                    ship.setMovement(ship.getMovement().normalize());
+                    ship.character.setTranslateX(Math.random()*WIDTH);
+                    ship.character.setTranslateY(Math.random()*HEIGHT);
 
-                    while(!isPositionSafe(new Point2D(Math.random()*WIDTH, Math.random()*HEIGHT), ship, asteroids, alientShoots, alienShip, 20)){
+                    while(!isPositionSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), ship, asteroids, alienShoots, alienShip, 200)){
                         ship.character.setTranslateX(Math.random()*WIDTH);
                         ship.character.setTranslateY(Math.random()*HEIGHT);
                     }
+                    ship.setMovement(ship.getMovement().normalize());
                     updateGameInformation(points, HP, level, asteroids, text, text1, text2);
                 }
                 else

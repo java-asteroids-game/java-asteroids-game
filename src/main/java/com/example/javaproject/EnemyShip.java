@@ -17,7 +17,6 @@ public class EnemyShip extends AbstractGameElement {
     public EnemyShip(int x, int y) {
         super(new CharacterFactory().createEnemyShip(), x, y);
         this.character.setFill(javafx.scene.paint.Color.GREEN);
-
     }
 
     //getter method for the created time variable
