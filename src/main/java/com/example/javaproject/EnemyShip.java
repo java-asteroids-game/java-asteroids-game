@@ -9,8 +9,6 @@ public class EnemyShip extends AbstractGameElement {
 
     private long createdAt = currentTimeMillis();
     public double speed;
-    private double changeX = Math.random() * 2 + 2;
-    private double changeY = Math.random() * 2 + 2;
     private boolean alive = false;
 
     //creates a green polygon
@@ -37,8 +35,8 @@ public class EnemyShip extends AbstractGameElement {
         // Change direction every 4 seconds
         if (currentTime - createdTime > 4000) {
             double angle = Math.random() * 2 * Math.PI;
-            changeX = Math.cos(angle) * (Math.random() * 2 );
-            changeY = Math.sin(angle) * (Math.random() * 2 );
+            double changeX = Math.cos(angle) * (Math.random() * 2 );
+            double changeY = Math.sin(angle) * (Math.random() * 2 );
             this.movement = new Point2D(changeX, changeY);
             setCreatedTime(currentTime);
         }
@@ -55,16 +53,18 @@ public class EnemyShip extends AbstractGameElement {
 
     public Projectile shootAtTarget(PlayerShip target) {
         // Set location to enemy ship location
-        Projectile projectile = new Projectile((int) this.getCharacter().getTranslateX(), (int) this.getCharacter().getTranslateY());
+        Projectile alienShoot = new Projectile((int) this.getCharacter().getTranslateX(), (int) this.getCharacter().getTranslateY(), ProjectileType.ALIEN);
 
         // Calculate angle between alien ship and target ship
-        double angle = Math.toDegrees(Math.atan2(target.getCharacter().getTranslateY() - projectile.getCharacter().getTranslateY(),
-                target.getCharacter().getTranslateX() - projectile.getCharacter().getTranslateX()));
+        double angle = Math.toDegrees(Math.atan2(target.getCharacter().getTranslateY() - alienShoot.getCharacter().getTranslateY(),
+                target.getCharacter().getTranslateX() - alienShoot.getCharacter().getTranslateX()));
 
         // Set the rotation of the projectile
-        projectile.getCharacter().setRotate(angle);
+        alienShoot.getCharacter().setRotate(angle);
 
-        return projectile;
+        alienShoot.setSpeed(this.getSpeed());
+
+        return alienShoot;
     }
 
 

@@ -1,20 +1,19 @@
 package com.example.javaproject;
 
 import javafx.geometry.Point2D;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 
 public class Projectile extends AbstractGameElement {
 
     private static final int MAX_FLIGHT_TIME = 180;
-    private int timeToLive;
-    private final long creationTime;
     public  boolean alive;
     public double speed;
 
-    public Projectile(int x, int y) {
+    public Projectile(int x, int y, ProjectileType type) {
         super(new CharacterFactory().createBullet(), x, y);
-        this.timeToLive = MAX_FLIGHT_TIME;
-        this.creationTime = System.nanoTime();
+        this.character.setFill(Color.valueOf(type.getColor()));
+        this.character.setStroke(Color.valueOf(type.getColor()));
         this.alive = true;
     }
 
@@ -42,14 +41,10 @@ public class Projectile extends AbstractGameElement {
         if (this.getCharacter().getTranslateX() < 0 || this.getCharacter().getTranslateX() > GameWindow.WIDTH ||
                 this.getCharacter().getTranslateY() < 0 || this.getCharacter().getTranslateY() > GameWindow.HEIGHT) {
             // Remove the projectile from the game window
-            this.Alive=false;
+            this.Alive = false;
             return true;
         }
         return false;
     }
-    
-    public boolean isAlive() {
-        long elapsedTime = (System.nanoTime() - creationTime) / 1_000_000_000;
-        return alive && elapsedTime < timeToLive;
-    }
+
 }

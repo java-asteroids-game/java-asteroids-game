@@ -112,7 +112,7 @@ public class Controls {
                     if (framesSinceLastShot >= 16) {
                         // When shooting the bullet in the same direction as the ship
                         Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
-                                (int) ship.getCharacter().getTranslateY());
+                                (int) ship.getCharacter().getTranslateY(), ProjectileType.PLAYER);
 
                         shot.setSpeed(ship.getSpeed());
 

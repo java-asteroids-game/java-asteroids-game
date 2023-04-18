@@ -66,9 +66,4 @@ public class Asteroid extends AbstractGameElement {
         return this.type;
     }
 
-    public boolean collide(AbstractGameElement other) {
-        Shape collisionArea = Shape.intersect(this.character, other.getCharacter());
-        return collisionArea.getBoundsInLocal().getWidth() != -1;
-    }
-
 }

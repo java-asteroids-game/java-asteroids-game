@@ -3,6 +3,7 @@ package com.example.javaproject;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Shape;
 
 public abstract class AbstractGameElement {
 
@@ -75,13 +76,22 @@ public abstract class AbstractGameElement {
         this.movement = movement;
     }
 
+    public Point2D getPosition(){
+        return new Point2D(this.getCharacter().getTranslateX(), this.getCharacter().getTranslateY());
+    }
+
     public abstract void move();
 
-    public abstract boolean collide(AbstractGameElement other);
+    public boolean collide(AbstractGameElement other) {
+        Shape collisionArea = Shape.intersect(this.character, other.getCharacter());
+        return collisionArea.getBoundsInLocal().getWidth() != -1;
+    }
 
     public double getSpeed(){
         return this.movement.distance(0,0);
     }
+
+
 
 
 }

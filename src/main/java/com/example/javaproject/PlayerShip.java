@@ -22,11 +22,9 @@ public class PlayerShip extends AbstractGameElement {
         this.character.setRotate(this.character.getRotate() - 4);
     }
 
-
     public void turnRight() {
         this.character.setRotate(this.character.getRotate() + 4);
     }
-
 
     public void accelerate() {
         double changeX = Math.cos(Math.toRadians(this.getCharacter().getRotate()));
@@ -43,6 +41,8 @@ public class PlayerShip extends AbstractGameElement {
 
     public void setInvincible(boolean invincible) {
         this.invincible = invincible;
+
+
     }
     public boolean collide(AbstractGameElement other) {
         if (invincible) {
@@ -52,11 +52,22 @@ public class PlayerShip extends AbstractGameElement {
         return collisionArea.getBoundsInLocal().getWidth() != -1;
     }
 
+    public Projectile shoot() {
+        Projectile shot = new Projectile((int) this.getCharacter().getTranslateX(),
+                (int) this.getCharacter().getTranslateY(), ProjectileType.PLAYER);
+        shot.setSpeed(this.getSpeed());
+        shot.getCharacter().setRotate(this.getCharacter().getRotate());
+
+        return shot;
+    }
+
+
+
     private boolean isPositionNotSafe(List<AbstractGameElement> characters, int safeDistance) {
-        Point2D newPosition = new Point2D(this.getCharacter().getTranslateX(), this.getCharacter().getTranslateX());
+        Point2D newPosition = this.getPosition();
         // Check for collisions with other characters
         for (AbstractGameElement character : characters){
-            if (newPosition.distance(character.getCharacter().getTranslateX(), character.getCharacter().getTranslateY()) < safeDistance){
+            if (newPosition.distance(character.getPosition()) < safeDistance){
                 return true;
             }
         }
@@ -64,12 +75,14 @@ public class PlayerShip extends AbstractGameElement {
     }
 
     public void moveSomewhereSafe(List<AbstractGameElement> characters, int safeDistance){
-            this.character.setTranslateY(Math.random() * GameWindow.WIDTH);
-            this.character.setTranslateY(Math.random() * GameWindow.HEIGHT);
-            while (this.isPositionNotSafe(characters, safeDistance)) {
-                this.character.setTranslateX(Math.random() * GameWindow.WIDTH);
-                this.character.setTranslateY(Math.random() * GameWindow.HEIGHT);
-            }
+        double newTranslateX, newTranslateY;
+        do {
+            newTranslateX = Math.random() * GameWindow.HEIGHT;
+            newTranslateY = Math.random() * GameWindow.WIDTH;
+            this.getCharacter().setTranslateX(newTranslateX);
+            this.getCharacter().setTranslateY(newTranslateY);
+        } while (this.isPositionNotSafe(characters, safeDistance));
+
     }
 
 

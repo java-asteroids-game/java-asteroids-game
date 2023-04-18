@@ -45,10 +45,35 @@ public class GameWindow {
     List<Projectile> alienShoots = new ArrayList<>();
     List <AbstractGameElement> characters = new ArrayList<>();
     PlayerShip ship = new PlayerShip(WIDTH / 2, HEIGHT / 2);
-    final EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2);
+    EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2);
 
+    private List<Text> setupUITextElements(Pane pane){
+        // Show current points ,current level, and current HP
+        Text pointsText = new Text(30, 40, "Points: 0");
+        Text levelText = new Text(30, 80, "Level: 1");
+        Text livesText = new Text(850, 40, "Lives: 3");
+        Text overheatText = new Text(30, 140, "Overheat");
+        List<Text> textElements = Arrays.asList(pointsText, levelText, livesText, overheatText);
 
-    public void asteroidsHitUpdatePoints() {
+        textElements.forEach(textElement -> {
+            textElement.setFill(Color.WHITE);
+            textElement.setStyle("-fx-font: 20 consolas;");
+            pane.getChildren().add(textElement);
+        });
+
+        return textElements;
+    }
+    private ProgressBar setupProgressBar(Pane pane){
+        ProgressBar progressBar = new ProgressBar();
+        progressBar.setPrefWidth(WIDTH - 870);
+        progressBar.setLayoutX(30);
+        progressBar.setLayoutY(HEIGHT - 500);
+        progressBar.setProgress(0);
+        pane.getChildren().add(progressBar);
+
+        return progressBar;
+    }
+    private void asteroidsHitUpdatePoints() {
         points.set(points.get() + 100);
 
         if (points.get() % 1000 == 0) {
@@ -56,12 +81,44 @@ public class GameWindow {
             level.incrementAndGet();
         }
     }
-
-    private void updateGameInformation(Text pointsText, Text levelText, Text livesText) {
-        pointsText.setText("Points: " + points);
-        livesText.setText("Lives: " + HP);
-        levelText.setText("Level: " + level);
+    private void updateGameInformation(List<Text> textElements) {
+        textElements.get(0).setText("Points: " + points);
+        textElements.get(2).setText("Lives: " + HP);
+        textElements.get(1).setText("Level: " + level);
     }
+    private void cheat(Pane pane){
+        //creates text to display when user cheats
+        Text cheatText = new Text("CHEATERS LOSE THEIR POINTS");
+        cheatText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        cheatText.setFill(Color.RED);
+        cheatText.setLayoutX(310);
+        cheatText.setLayoutY(300);
+        cheatText.setOpacity(0.0);
+
+        pane.getChildren().add(cheatText);
+
+        //sets the duration and opacity for appearance of cheatText (alternates on/off)
+        Timeline cheatTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(0.5), e -> cheatText.setOpacity(1.0)),
+                new KeyFrame(Duration.seconds(1.0), e -> cheatText.setOpacity(0.0))
+        );
+        //sets the cycle as indefinite - remains until gameover
+        cheatTimeline.setCycleCount(Timeline.INDEFINITE);
+        cheatTimeline.play();
+
+
+        // Clears asteroids
+        asteroids.forEach(asteroid -> {
+            pane.getChildren().remove(asteroid.getCharacter());
+        });
+        asteroids.clear();
+        framesSinceLastGodMode = 0;
+        level.set(3);
+        points.set(0);
+
+    }
+
+
 
 
     public void load(Stage stage, int numAsteroids) {
@@ -72,28 +129,14 @@ public class GameWindow {
         //get children method to add a shape
         pane.getChildren().add(ship.getCharacter());
 
-        // Show current points ,current level, and current HP
-        Text pointsText = new Text(30, 40, "Points: 0");
-        Text levelText = new Text(30, 80, "Level: 1");
-        Text livesText = new Text(850, 40, "Lives: 3");
-        Text overheatText = new Text(30, 140, "Overheat");
-        pointsText.setFill(Color.WHITE);
-        levelText.setFill(Color.WHITE);
-        livesText.setFill(Color.WHITE);
-        overheatText.setFill(Color.WHITE);
-        pointsText.setStyle("-fx-font: 20 consolas;");
-        levelText.setStyle("-fx-font: 20 consolas;");
-        livesText.setStyle("-fx-font: 20 consolas;");
-        overheatText.setStyle("-fx-font: 20 consolas;");
-        pane.getChildren().add(pointsText);
-        pane.getChildren().add(levelText);
-        pane.getChildren().add(livesText);
-        pane.getChildren().add(overheatText);
+        List<Text> UITextElements = setupUITextElements(pane);
+
+        ProgressBar progressBar = setupProgressBar(pane);
 
         // Creates the generator for the alien. Sets up timeline events to check if the alien is alive
         Timeline alienGenerator = new Timeline();
         alienGenerator.getKeyFrames().add(
-                new KeyFrame(Duration.seconds(10), event -> {
+                new KeyFrame(Duration.seconds(20), event -> {
                     if (!alienShip.isAlive()) {
                         alienShip.getCharacter().setTranslateX(Math.random() * WIDTH);
                         alienShip.getCharacter().setTranslateY(Math.random() * HEIGHT);
@@ -102,21 +145,14 @@ public class GameWindow {
                     }
                 })
         );
-
         alienGenerator.setCycleCount(Timeline.INDEFINITE);
         alienGenerator.play();
 
-        ProgressBar progressBar = new ProgressBar();
-        progressBar.setPrefWidth(WIDTH - 870);
-        progressBar.setLayoutX(30);
-        progressBar.setLayoutY(HEIGHT - 500);
-        progressBar.setProgress(0);
-        pane.getChildren().add(progressBar);
 
         double l = 0.1;
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd = new Random();
-            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),/*25,*/0.1, AsteroidType.LARGE);
+            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),0.1, AsteroidType.LARGE);
             asteroids.add(asteroid);
         }
         double scale = 0.5;
@@ -141,61 +177,18 @@ public class GameWindow {
                 //System.out.println("Asteroids: " + asteroids.size());
                 //System.out.println("Shoots: " + shoots.size());
 
-                if (pressedKeys.getOrDefault(KeyCode.A, false) && !pressedKeys.getOrDefault(KeyCode.RIGHT, false)) {
+                // ^ is the same as XOR
+                if (pressedKeys.getOrDefault(KeyCode.A, false) ^ pressedKeys.getOrDefault(KeyCode.LEFT, false)) {
                     ship.turnLeft();
                 }
 
-                if (pressedKeys.getOrDefault(KeyCode.D, false) && !pressedKeys.getOrDefault(KeyCode.LEFT, false)) {
+                if (pressedKeys.getOrDefault(KeyCode.D, false) ^ pressedKeys.getOrDefault(KeyCode.RIGHT, false)) {
                     ship.turnRight();
                 }
 
-                if (pressedKeys.getOrDefault(KeyCode.W, false)) {
+                if (pressedKeys.getOrDefault(KeyCode.W, false) ^ pressedKeys.getOrDefault(KeyCode.UP, false)) {
                     ship.accelerate();
                 }
-                if (pressedKeys.getOrDefault(KeyCode.LEFT, false)) {
-                    ship.turnLeft();
-                }
-
-                if (pressedKeys.getOrDefault(KeyCode.RIGHT, false)) {
-                    ship.turnRight();
-                }
-                if (pressedKeys.getOrDefault(KeyCode.UP, false)) {
-                    ship.accelerate();
-                }
-
-                //creates text to display when user cheats
-                Text cheatText = new Text("CHEATERS LOSE THEIR POINTS");
-                cheatText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-                cheatText.setFill(Color.RED);
-                cheatText.setLayoutX(310);
-                cheatText.setLayoutY(300);
-                cheatText.setOpacity(0.0);
-
-                //sets the duration and opacity for appearance of cheatText (alternates on/off)
-                Timeline cheatTimeline = new Timeline(
-                        new KeyFrame(Duration.seconds(0.5), e -> cheatText.setOpacity(1.0)),
-                        new KeyFrame(Duration.seconds(1.0), e -> cheatText.setOpacity(0.0))
-                );
-                //sets the cycle as indefinite - remains until gameover
-                cheatTimeline.setCycleCount(Timeline.INDEFINITE);
-                pane.getChildren().add(cheatText);
-
-
-                //sets 'u' key as a 'cheat' key which destroys all asteroids, sets (reduces) level to 3, displays annoying text
-                //level 3 and over only, waits 250 frames, usage sets points to 0
-                if (pressedKeys.getOrDefault(KeyCode.U, false) && level.get()>=3 && framesSinceLastGodMode>250) {
-                    asteroids.forEach(asteroid -> {
-                        pane.getChildren().remove(asteroid.getCharacter());
-                    });
-                    asteroids.removeAll(asteroids);
-                    framesSinceLastGodMode = 0;
-                    //level.set(level.get()-2);
-                    level.set(3);
-                    points.set(0);
-                    framesSinceLastGodMode = 0;
-                    cheatTimeline.play();
-                }
-                framesSinceLastGodMode ++;
 
                 boolean moveAndShootPressed = (pressedKeys.getOrDefault(KeyCode.D, false) || pressedKeys.getOrDefault(KeyCode.A, false) || pressedKeys.getOrDefault(KeyCode.W, false))
                         && pressedKeys.getOrDefault(KeyCode.SPACE, false);
@@ -204,68 +197,74 @@ public class GameWindow {
                     handleShipShooting();
                 }
 
-                scene.setOnKeyPressed(event -> {
-                    pressedKeys.put(event.getCode(), Boolean.TRUE);
+                if (pressedKeys.getOrDefault(KeyCode.SHIFT, false)){
+                    handleHyperJump();
+                }
 
-                    if (event.getCode() == KeyCode.SHIFT) {
-                        handleHyperJump();
-                    }
-                });
-
+                //sets 'u' key as a 'cheat' key which destroys all asteroids, sets (reduces) level to 3, displays annoying text
+                //level 3 and over only, waits 250 frames, usage sets points to 0
+                if (pressedKeys.getOrDefault(KeyCode.U, false)) {
+                    handleCheating();
+                }
             }
 
             private void handleShipShooting() {
                 if (framesSinceLastShot >= 15 && shoots.size() < 6) {
                     // When shooting the bullet in the same direction as the ship
-                    Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
-                            (int) ship.getCharacter().getTranslateY());
-
-                    shot.setSpeed(ship.getSpeed());
-
-                    shot.getCharacter().setRotate(ship.getCharacter().getRotate());
+                    Projectile shot = ship.shoot();
                     shoots.add(shot);
-                    shot.move();
                     pane.getChildren().add(shot.getCharacter());
-
                     // Reset the framesSinceLastShot counter
                     framesSinceLastShot = 0;
                 }
-                // Increment the framesSinceLastShot counter on each frame
-                framesSinceLastShot++;
+            }
+
+            private void handleCheating(){
+                if  (level.get() >= 3 && framesSinceLastGodMode > 250){
+                    cheat(pane);
+                    framesSinceLastGodMode = 0;
+                }
             }
 
             private void handleAlienShooting() {
                 if (alienShip.isAlive()) {
                     if (framesSinceLastAlienShot >= 100) {
                         Projectile alienShot = alienShip.shootAtTarget(ship);
-                        alienShot.setSpeed(alienShip.getSpeed());
                         alienShoots.add(alienShot);
-                        alienShot.move();
                         pane.getChildren().add(alienShot.getCharacter());
-
                         // Reset the framesSinceLastShot counter
                         framesSinceLastAlienShot = 0;
                     }
                 }
 
-                // Increment the framesSinceLastShot counter on each frame
-                framesSinceLastAlienShot++;
+                ObservableList<Projectile> observableShots = FXCollections.observableList(shoots);
+                DoubleBinding progressBinding = Bindings.createDoubleBinding((Callable<Double>) () -> {
+                    if (observableShots.size() == 0) {
+                        return 0.0;
+                    } else if (observableShots.size() == 6) {
+                        return 1.0;
+                    } else {
+                        return (double) observableShots.size() / 6;
+                    }
+                }, (Observable) observableShots);
+                progressBar.progressProperty().bind(progressBinding);
+
             }
 
             private void handleHyperJump() {
                 characters.add(alienShip);
                 characters.addAll(alienShoots);
                 characters.addAll(asteroids);
-                ship.moveSomewhereSafe(characters, 200);
+                ship.moveSomewhereSafe(characters, 150);
                 characters.clear();
             }
-
 
             private void moveObjects() {
                 ship.move();
                 alienShip.move();
+                shoots.forEach(shot -> shot.move());
+                alienShoots.forEach(alienShoot -> alienShoot.move());
                 asteroids.forEach(asteroid -> asteroid.move());
-                handleAlienShooting();
             }
 
             private void damageShip() {
@@ -276,7 +275,7 @@ public class GameWindow {
                     //get children method to add a shape
                     handleHyperJump();
                     ship.setMovement(ship.getMovement().normalize());
-                    updateGameInformation(pointsText, levelText, livesText);
+//                    updateGameInformation(UITextElements);
 
                     ship.setInvincible(true); // Set ship invincible
 
@@ -305,31 +304,11 @@ public class GameWindow {
                     stage.setScene(gameOverScene);
                 }
 
-                    updateGameInformation(pointsText, levelText, livesText);
+//                    updateGameInformation(UITextElements);
                 }
-//                HP.decrementAndGet();
-//
-//                if (HP.get() > 0) {
-//                    //get children method to add a shape
-//                    ship.character.setTranslateX(Math.random() * WIDTH);
-//                    ship.character.setTranslateY(Math.random() * HEIGHT);
-//
-//                    while (isPositionNotSafe(new Point2D(ship.getCharacter().getTranslateX(), ship.getCharacter().getTranslateY()), 200)) {
-//                        ship.character.setTranslateX(Math.random() * WIDTH);
-//                        ship.character.setTranslateY(Math.random() * HEIGHT);
-//                    }
-//                    ship.setMovement(ship.getMovement().normalize());
-//                    updateGameInformation(pointsText, levelText, livesText);
-//                } else {
-//                    stop();
-//                    pane.getChildren().clear();
-//                    int finalPoints = points.get();
-//                    Scene gameOverScene = new GameOver().showGameOverScreen(stage, finalPoints);
-//                    stage.setScene(gameOverScene);
-//                }
-//
-//                updateGameInformation(pointsText, levelText, livesText);
+
             }
+
             private void handleCollisions() {
                 manageBulletCollisions();
                 manageAlienBulletCollisions();
@@ -350,7 +329,6 @@ public class GameWindow {
                     }
 
                     level.incrementAndGet();
-                    levelText.setText("Level: " + level.get());
                 }
 
                 asteroids.forEach(asteroid -> {
@@ -370,7 +348,7 @@ public class GameWindow {
                     framesSinceLastRandomAsteroid = 0;
                 }
 
-                updateGameInformation(pointsText, levelText, livesText);
+//                updateGameInformation(UITextElements);
                 framesSinceLastRandomAsteroid++;
             }
 
@@ -459,25 +437,21 @@ public class GameWindow {
                 }
             }
 
+            private void updateFrameCounters(){
+                framesSinceLastShot++;
+                framesSinceLastAlienShot++;
+                framesSinceLastGodMode++;
+                framesSinceLastRandomAsteroid++;
+            }
+
             @Override
             public void handle(long now) {
                 handleInput();
                 moveObjects();
+                handleAlienShooting();
                 handleCollisions();
-                updateGameInformation(pointsText, levelText, livesText);
-
-                ObservableList<Projectile> observableShots = FXCollections.observableList(shoots);
-                DoubleBinding progressBinding = Bindings.createDoubleBinding((Callable<Double>) () -> {
-                    if (observableShots.size() == 0) {
-                        return 0.0;
-                    } else if (observableShots.size() == 6) {
-                        return 1.0;
-                    } else {
-                        return (double) observableShots.size() / 6;
-                    }
-                }, (Observable) observableShots);
-                progressBar.progressProperty().bind(progressBinding);
-
+                updateGameInformation(UITextElements);
+                updateFrameCounters();
             }
 
         }.start();
