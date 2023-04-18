@@ -5,11 +5,11 @@ package com.example.javaproject;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyCode;
@@ -22,7 +22,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GameWindow {
@@ -36,9 +35,10 @@ public class GameWindow {
     AtomicInteger HP = new AtomicInteger(3);
 
     int framesSinceLastShot = 15;
-    int framesSinceLastAlienShot = 0;
+    int framesSinceLastAlienShot = 50;
     int framesSinceLastRandomAsteroid = 0;
     int framesSinceLastGodMode = 0;
+    int framesSinceLastHyperJump = 0;
 
     List<Asteroid> asteroids = new ArrayList<>();
     List<Projectile> shoots = new LinkedList<>();
@@ -85,6 +85,8 @@ public class GameWindow {
         textElements.get(0).setText("Points: " + points);
         textElements.get(2).setText("Lives: " + HP);
         textElements.get(1).setText("Level: " + level);
+
+        textElements.forEach(Node::toFront);
     }
     private void cheat(Pane pane){
         //creates text to display when user cheats
@@ -105,6 +107,15 @@ public class GameWindow {
         //sets the cycle as indefinite - remains until gameover
         cheatTimeline.setCycleCount(Timeline.INDEFINITE);
         cheatTimeline.play();
+        // Ship blinks for god mode
+//        Timeline cheatBlink = new Timeline(
+//                new KeyFrame(Duration.ZERO, e -> ship.getCharacter().setVisible(true)),
+//                new KeyFrame(Duration.millis(100), e -> ship.getCharacter().setVisible(false)),
+//                new KeyFrame(Duration.millis(200), e -> ship.getCharacter().setVisible(true))
+//        );
+//        cheatBlink.setCycleCount(Timeline.INDEFINITE);
+//        cheatBlink.play();
+
 
 
         // Clears asteroids
@@ -138,6 +149,7 @@ public class GameWindow {
         alienGenerator.getKeyFrames().add(
                 new KeyFrame(Duration.seconds(20), event -> {
                     if (!alienShip.isAlive()) {
+                        framesSinceLastAlienShot = 0;
                         alienShip.getCharacter().setTranslateX(Math.random() * WIDTH);
                         alienShip.getCharacter().setTranslateY(Math.random() * HEIGHT);
                         pane.getChildren().add(alienShip.getCharacter());
@@ -149,14 +161,13 @@ public class GameWindow {
         alienGenerator.play();
 
 
-        double l = 0.1;
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd = new Random();
-            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),0.1, AsteroidType.LARGE);
+            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), AsteroidType.LARGE);
             asteroids.add(asteroid);
         }
-        double scale = 0.5;
-        Asteroid asteroid_special = new Asteroid(WIDTH / 2, 500, .4, AsteroidType.SPECIAL);
+
+        Asteroid asteroid_special = new Asteroid(WIDTH / 2, 500, AsteroidType.SPECIAL);
         asteroids.add(asteroid_special);
         asteroids.forEach(asteroid -> pane.getChildren().add(asteroid.getCharacter()));
 
@@ -190,10 +201,7 @@ public class GameWindow {
                     ship.accelerate();
                 }
 
-                boolean moveAndShootPressed = (pressedKeys.getOrDefault(KeyCode.D, false) || pressedKeys.getOrDefault(KeyCode.A, false) || pressedKeys.getOrDefault(KeyCode.W, false))
-                        && pressedKeys.getOrDefault(KeyCode.SPACE, false);
-
-                if (pressedKeys.getOrDefault(KeyCode.SPACE, false) || moveAndShootPressed) {
+                if (pressedKeys.getOrDefault(KeyCode.SPACE, false)) {
                     handleShipShooting();
                 }
 
@@ -238,7 +246,7 @@ public class GameWindow {
                 }
 
                 ObservableList<Projectile> observableShots = FXCollections.observableList(shoots);
-                DoubleBinding progressBinding = Bindings.createDoubleBinding((Callable<Double>) () -> {
+                DoubleBinding progressBinding = Bindings.createDoubleBinding(() -> {
                     if (observableShots.size() == 0) {
                         return 0.0;
                     } else if (observableShots.size() == 6) {
@@ -246,67 +254,15 @@ public class GameWindow {
                     } else {
                         return (double) observableShots.size() / 6;
                     }
-                }, (Observable) observableShots);
+                }, observableShots);
                 progressBar.progressProperty().bind(progressBinding);
-
             }
 
             private void handleHyperJump() {
-                characters.add(alienShip);
-                characters.addAll(alienShoots);
-                characters.addAll(asteroids);
-                ship.moveSomewhereSafe(characters, 150);
-                characters.clear();
-            }
-
-            private void moveObjects() {
-                ship.move();
-                alienShip.move();
-                shoots.forEach(shot -> shot.move());
-                alienShoots.forEach(alienShoot -> alienShoot.move());
-                asteroids.forEach(asteroid -> asteroid.move());
-            }
-
-            private void damageShip() {
-                if (!ship.isInvincible()) {
-                    HP.decrementAndGet();
-
-                if (HP.get() > 0) {
-                    //get children method to add a shape
-                    handleHyperJump();
-                    ship.setMovement(ship.getMovement().normalize());
-//                    updateGameInformation(UITextElements);
-
-                    ship.setInvincible(true); // Set ship invincible
-
-                    // Blinking animation
-                    Timeline blinkTimeline = new Timeline(
-                            new KeyFrame(Duration.ZERO, e -> ship.getCharacter().setVisible(true)),
-                            new KeyFrame(Duration.millis(100), e -> ship.getCharacter().setVisible(false)),
-                            new KeyFrame(Duration.millis(200), e -> ship.getCharacter().setVisible(true))
-                    );
-                    blinkTimeline.setCycleCount(15); // Number of blinks (15 blinks in 3 seconds)
-                    blinkTimeline.play();
-
-                    Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            ship.setInvincible(false); // Remove invincibility after 3 seconds
-                            ship.getCharacter().setVisible(true); // Ensure the ship is visible after the invincibility period
-                        }
-                    }, 3000);
-                } else {
-                    stop();
-                    pane.getChildren().clear();
-                    int finalPoints = points.get();
-                    Scene gameOverScene = new GameOver().showGameOverScreen(stage, finalPoints);
-                    stage.setScene(gameOverScene);
+                if (framesSinceLastHyperJump >= 10){
+                    moveShipToSafety();
+                    framesSinceLastHyperJump = 0;
                 }
-
-//                    updateGameInformation(UITextElements);
-                }
-
             }
 
             private void handleCollisions() {
@@ -319,11 +275,10 @@ public class GameWindow {
                 if (asteroids.isEmpty()) {
 
                     int newNumAsteroids = numAsteroids + 1;
-                    double newScale = scale + 0.1;
-                    for (int i = 0; i < newNumAsteroids; i++) {
 
+                    for (int i = 0; i < newNumAsteroids; i++) {
                         Random rnd = new Random();
-                        Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), newScale, AsteroidType.LARGE);
+                        Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), AsteroidType.LARGE);
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
                     }
@@ -338,18 +293,15 @@ public class GameWindow {
                     }
                 });
 
-                if(framesSinceLastRandomAsteroid >10 && Math.random() < 0.005){
+                if(framesSinceLastRandomAsteroid > 10 && Math.random() < 0.005){
                     double rnd_2 = Math.random() * 1000;
-                    Asteroid asteroid = new Asteroid((int) rnd_2 % WIDTH, 0, l, AsteroidType.MEDIUM);
+                    Asteroid asteroid = new Asteroid((int) rnd_2 % WIDTH, 0, AsteroidType.MEDIUM);
                     if (!asteroid.collide(ship)) {
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
                     }
                     framesSinceLastRandomAsteroid = 0;
                 }
-
-//                updateGameInformation(UITextElements);
-                framesSinceLastRandomAsteroid++;
             }
 
             private void manageBulletCollisions() {
@@ -388,17 +340,17 @@ public class GameWindow {
                                 for (int i = 0; i < 2; i++) {
                                     if (delete.getType() == AsteroidType.SPECIAL) {
                                         Asteroid asteroid = new Asteroid((int) delete.getCharacter()
-                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(),/*25,*/l + 0.2, AsteroidType.LARGE);
+                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(), AsteroidType.LARGE);
                                         asteroids.add(asteroid);
                                         pane.getChildren().add(asteroid.getCharacter());
                                     } else if (delete.getType() == AsteroidType.LARGE) {
                                         Asteroid asteroid = new Asteroid((int) delete.getCharacter()
-                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(),/*25,*/l + 0.2, AsteroidType.MEDIUM);
+                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(), AsteroidType.MEDIUM);
                                         asteroids.add(asteroid);
                                         pane.getChildren().add(asteroid.getCharacter());
                                     } else if (delete.getType() == AsteroidType.MEDIUM) {
                                         Asteroid asteroid = new Asteroid((int) delete.getCharacter()
-                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(),/*12,*/l + 0.2, AsteroidType.SMALL);
+                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(), AsteroidType.SMALL);
                                         asteroids.add(asteroid);
                                         pane.getChildren().add(asteroid.getCharacter());
                                     }
@@ -442,6 +394,61 @@ public class GameWindow {
                 framesSinceLastAlienShot++;
                 framesSinceLastGodMode++;
                 framesSinceLastRandomAsteroid++;
+                framesSinceLastHyperJump++;
+            }
+
+            private void moveObjects() {
+                ship.move();
+                alienShip.move();
+                shoots.forEach(shot -> shot.move());
+                alienShoots.forEach(alienShoot -> alienShoot.move());
+                asteroids.forEach(asteroid -> asteroid.move());
+            }
+
+            private void damageShip() {
+                if (!ship.isInvincible()) {
+                    HP.decrementAndGet();
+
+                    if (HP.get() > 0) {
+                        moveShipToSafety();
+                        ship.setMovement(ship.getMovement().normalize());
+
+                        ship.setInvincible(true); // Set ship invincible
+
+                        // Blinking animation
+                        Timeline blinkTimeline = new Timeline(
+                                new KeyFrame(Duration.ZERO, e -> ship.getCharacter().setVisible(true)),
+                                new KeyFrame(Duration.millis(100), e -> ship.getCharacter().setVisible(false)),
+                                new KeyFrame(Duration.millis(200), e -> ship.getCharacter().setVisible(true))
+                        );
+                        blinkTimeline.setCycleCount(15); // Number of blinks (15 blinks in 3 seconds)
+                        blinkTimeline.play();
+
+                        Timer timer = new Timer();
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                ship.setInvincible(false); // Remove invincibility after 3 seconds
+                                ship.getCharacter().setVisible(true); // Ensure the ship is visible after the invincibility period
+                            }
+                        }, 3000);
+                    } else {
+                        stop();
+                        pane.getChildren().clear();
+                        int finalPoints = points.get();
+                        Scene gameOverScene = new GameOver().showGameOverScreen(stage, finalPoints);
+                        stage.setScene(gameOverScene);
+                    }
+                }
+
+            }
+
+            private void moveShipToSafety(){
+                characters.add(alienShip);
+                characters.addAll(alienShoots);
+                characters.addAll(asteroids);
+                ship.moveSomewhereSafe(characters, 150);
+                characters.clear();
             }
 
             @Override

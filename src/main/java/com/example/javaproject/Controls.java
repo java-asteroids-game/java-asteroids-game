@@ -74,7 +74,7 @@ public class Controls {
         List<Asteroid> asteroids = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
             Random rnd= new Random();
-            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),/*25,*/0.3, AsteroidType.SMALL);
+            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), AsteroidType.SMALL);
             asteroids.add(asteroid);
         }
         asteroids.forEach(asteroid -> pane1.getChildren().add(asteroid.getCharacter()));
@@ -86,7 +86,7 @@ public class Controls {
 
                 if (asteroids.size() < 10) {
                     Random rnd= new Random();
-                    Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT),/*35,*/0.5, AsteroidType.SMALL);
+                    Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), AsteroidType.SMALL);
                     asteroids.add(asteroid);
                     pane1.getChildren().add(asteroid.getCharacter());
                     }
