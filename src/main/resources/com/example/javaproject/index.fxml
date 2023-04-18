@@ -15,7 +15,7 @@
                 <Bloom />
             </effect>
         </Label>
-        <Label fx:id="highscore" layoutX="372.0" layoutY="422.0" onMouseClicked="#mouseClickScore" onMouseEntered="#mouseEnterScore" onMouseExited="#mouseExitScore" prefHeight="62.0" prefWidth="248.0" text="HIGH SCORE" textFill="WHITE">
+        <Label fx:id="highscore" layoutX="368.0" layoutY="422.0" onMouseClicked="#mouseClickScore" onMouseEntered="#mouseEnterScore" onMouseExited="#mouseExitScore" prefHeight="62.0" prefWidth="248.0" text="HIGH SCORE" textFill="WHITE">
             <font>
                 <Font name="Courier New" size="38.0" />
             </font>
@@ -23,7 +23,7 @@
                 <Bloom />
             </effect>
         </Label>
-        <Label fx:id="controls" layoutX="386.0" layoutY="505.0" onMouseClicked="#mouseClickControls" onMouseEntered="#mouseEnterControls" onMouseExited="#mouseExitControls" prefHeight="62.0" prefWidth="248.0" text="CONTROLS" textFill="WHITE">
+        <Label fx:id="controls" layoutX="392.0" layoutY="505.0" onMouseClicked="#mouseClickControls" onMouseEntered="#mouseEnterControls" onMouseExited="#mouseExitControls" prefHeight="62.0" prefWidth="248.0" text="CONTROLS" textFill="WHITE">
             <font>
                 <Font name="Courier New" size="38.0" />
             </font>
