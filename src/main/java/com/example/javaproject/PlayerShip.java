@@ -5,7 +5,7 @@ import javafx.scene.shape.Shape;
 
 import java.util.List;
 
-public class PlayerShip extends AbstractGameElement {
+public class PlayerShip extends AbstractGameElement implements Ship {
 
     private boolean invincible = false;
     public PlayerShip(int x, int y) {
@@ -41,7 +41,6 @@ public class PlayerShip extends AbstractGameElement {
 
     public void setInvincible(boolean invincible) {
         this.invincible = invincible;
-
 
     }
     public boolean collide(AbstractGameElement other) {
@@ -82,6 +81,5 @@ public class PlayerShip extends AbstractGameElement {
         } while (this.isPositionNotSafe(characters, safeDistance));
 
     }
-
 
 }
