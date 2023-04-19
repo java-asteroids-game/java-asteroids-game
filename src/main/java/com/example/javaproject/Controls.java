@@ -16,6 +16,8 @@ public class Controls {
     public static final int WIDTH = 960;
     public static final int HEIGHT = 600;
     static int framesSinceLastShot = 0;
+    static int framesSinceLastHyperJump = 0;
+
     public static void load(Stage stage) {
         javafx.scene.layout.Pane pane1 = new Pane();
         pane1.setPrefSize(WIDTH, HEIGHT);
@@ -27,13 +29,13 @@ public class Controls {
         titleText.setOpacity(.4);
         pane1.getChildren().add(titleText);
 
-        Text controlText = new Text((WIDTH/2 -280), 440, "W / UP: Accelerate     A / LEFT :Turn Left     D / RIGHT: Turn Right");
+        Text controlText = new Text((WIDTH/2 -280), 440, "W / UP: Accelerate     A / LEFT: Turn Left     D / RIGHT: Turn Right");
         controlText.setFill(Color.WHITE);
         controlText.setStyle("-fx-font: 20 arial;");
         controlText.setOpacity(.4);
         pane1.getChildren().add(controlText);
 
-        Text controlText1 = new Text((WIDTH/2 - 60), 480, "Space:  Shoot");
+        Text controlText1 = new Text((WIDTH/2 - 170), 480, "Space: Shoot    Shift: Hyperspace Jump");
         controlText1.setFill(Color.WHITE);
         controlText1.setStyle("-fx-font: 20 arial;");
         controlText1.setOpacity(.4);
@@ -79,6 +81,11 @@ public class Controls {
         }
         asteroids.forEach(asteroid -> pane1.getChildren().add(asteroid.getCharacter()));
 
+        List <AbstractGameElement> characters = new ArrayList<>();
+        for (Asteroid asteroid : asteroids) {
+            characters.add(asteroid);
+        }
+
         new AnimationTimer() {
 
             @Override
@@ -101,6 +108,13 @@ public class Controls {
 
                 if (pressedKeys.getOrDefault(KeyCode.W, false)||pressedKeys.getOrDefault(KeyCode.UP, false)) {
                     ship.accelerate();
+                }
+
+                if (framesSinceLastHyperJump > 10){
+                    if (pressedKeys.getOrDefault(KeyCode.SHIFT, false)||pressedKeys.getOrDefault(KeyCode.SHIFT, false)) {
+                        ship.moveSomewhereSafe(characters, 100);
+                        framesSinceLastHyperJump = 0;
+                    }
                 }
 
                 boolean moveAndShootPressed = (pressedKeys.getOrDefault(KeyCode.D, false) || pressedKeys.getOrDefault(KeyCode.A, false) || pressedKeys.getOrDefault(KeyCode.W, false))
@@ -129,6 +143,7 @@ public class Controls {
 
                 // Increment the framesSinceLastShot counter on each frame
                 framesSinceLastShot++;
+                framesSinceLastHyperJump++;
 
                 ship.move();
                 asteroids.forEach(asteroid -> asteroid.move());

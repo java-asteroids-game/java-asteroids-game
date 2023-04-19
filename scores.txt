@@ -18,3 +18,5 @@ Tania	0
 Tania	9300
 Tania	3500
 Tania	800
+Conor	20300
+Conor	1500
