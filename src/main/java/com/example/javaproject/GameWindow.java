@@ -217,7 +217,7 @@ public class GameWindow {
             }
 
             private void handleShipShooting() {
-                if (framesSinceLastShot >= 15 && shoots.size() < 6) {
+                if (framesSinceLastShot >= 15 && shoots.size() < 4) {
                     // When shooting the bullet in the same direction as the ship
                     Projectile shot = ship.shoot();
                     shoots.add(shot);
@@ -249,10 +249,10 @@ public class GameWindow {
                 DoubleBinding progressBinding = Bindings.createDoubleBinding(() -> {
                     if (observableShots.size() == 0) {
                         return 0.0;
-                    } else if (observableShots.size() == 6) {
+                    } else if (observableShots.size() == 4) {
                         return 1.0;
                     } else {
-                        return (double) observableShots.size() / 6;
+                        return (double) observableShots.size() / 4;
                     }
                 }, observableShots);
                 progressBar.progressProperty().bind(progressBinding);

@@ -57,7 +57,6 @@ public class Controls {
         List<Projectile> shoots = new ArrayList<>();
 
         Map<KeyCode, Boolean> pressedKeys = new HashMap<>();
-        //Scene scene1 = new Scene(pane1);
         scene.setOnKeyPressed(event -> {
             pressedKeys.put(event.getCode(), Boolean.TRUE);
         });
@@ -80,7 +79,6 @@ public class Controls {
         asteroids.forEach(asteroid -> pane1.getChildren().add(asteroid.getCharacter()));
 
         new AnimationTimer() {
-
             @Override
             public void handle(long now) {
 
@@ -111,22 +109,13 @@ public class Controls {
                     // Check if enough frames have passed since the last shot
                     if (framesSinceLastShot >= 16) {
                         // When shooting the bullet in the same direction as the ship
-                        Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
-                                (int) ship.getCharacter().getTranslateY(), ProjectileType.PLAYER);
+                        Projectile shot = ship.shoot();
 
-                        shot.setSpeed(ship.getSpeed());
-
-                        shot.getCharacter().setRotate(ship.getCharacter().getRotate());
                         shoots.add(shot);
-                        shot.move();
                         pane1.getChildren().add(shot.getCharacter());
-
-                        // Reset the framesSinceLastShot counter
                         framesSinceLastShot = 0;
                     }
-                    //pressedKeys.clear();
                 }
-
                 // Increment the framesSinceLastShot counter on each frame
                 framesSinceLastShot++;
 
@@ -144,7 +133,6 @@ public class Controls {
                         }
                     }
                     });
-
 
                 Iterator<Projectile> iterator = shoots.iterator();
                 while(iterator.hasNext()) {
@@ -169,16 +157,16 @@ public class Controls {
                         asteroids.remove(delete);
                         pane1.getChildren().remove(delete.getCharacter());
 
-                        // Count Level up
                     });
                     return true;
                 }).toList();
 
-                // Add points,HP and level
                 destroy_asteroid.forEach(shot -> {
                     pane1.getChildren().remove(shot.getCharacter());
                     shoots.remove(shot);
                 });
+
+                shoots.forEach(shot -> shot.move());
             }
 
         }.start();
@@ -186,7 +174,6 @@ public class Controls {
         stage.setScene(scene);
         stage.show();
         stage.setResizable(false);
-
     }
 }
 
