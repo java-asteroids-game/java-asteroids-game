@@ -77,8 +77,12 @@ public class GameWindow {
         points.set(points.get() + 100);
 
         if (points.get() % 1000 == 0) {
-            HP.incrementAndGet();
             level.incrementAndGet();
+            AsteroidType.increaseSpeeds(0.2);
+        }
+
+        if (points.get()% 5000 == 0){
+            HP.incrementAndGet();
         }
     }
     private void updateGameInformation(List<Text> textElements) {
@@ -160,7 +164,7 @@ public class GameWindow {
         alienGenerator.setCycleCount(Timeline.INDEFINITE);
         alienGenerator.play();
 
-
+        AsteroidType.resetSpeeds();
         for (int i = 0; i < numAsteroids; i++) {
             Random rnd = new Random();
             Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), AsteroidType.LARGE);
@@ -275,7 +279,6 @@ public class GameWindow {
                 if (asteroids.isEmpty()) {
 
                     int newNumAsteroids = numAsteroids + 1;
-
                     for (int i = 0; i < newNumAsteroids; i++) {
                         Random rnd = new Random();
                         Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), AsteroidType.LARGE);
@@ -283,7 +286,6 @@ public class GameWindow {
                         pane.getChildren().add(asteroid.getCharacter());
                     }
 
-                    level.incrementAndGet();
                 }
 
                 asteroids.forEach(asteroid -> {
