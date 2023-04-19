@@ -61,8 +61,6 @@ public class PlayerShip extends AbstractGameElement {
         return shot;
     }
 
-
-
     private boolean isPositionNotSafe(List<AbstractGameElement> characters, int safeDistance) {
         Point2D newPosition = this.getPosition();
         // Check for collisions with other characters

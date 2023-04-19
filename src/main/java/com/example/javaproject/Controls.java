@@ -16,6 +16,8 @@ public class Controls {
     public static final int WIDTH = 960;
     public static final int HEIGHT = 600;
     static int framesSinceLastShot = 0;
+    static int framesSinceLastHyperJump = 0;
+
     public static void load(Stage stage) {
         javafx.scene.layout.Pane pane1 = new Pane();
         pane1.setPrefSize(WIDTH, HEIGHT);
@@ -27,13 +29,13 @@ public class Controls {
         titleText.setOpacity(.4);
         pane1.getChildren().add(titleText);
 
-        Text controlText = new Text((WIDTH/2 -280), 440, "W / UP: Accelerate     A / LEFT :Turn Left     D / RIGHT: Turn Right");
+        Text controlText = new Text((WIDTH/2 -280), 440, "W / UP: Accelerate     A / LEFT: Turn Left     D / RIGHT: Turn Right");
         controlText.setFill(Color.WHITE);
         controlText.setStyle("-fx-font: 20 arial;");
         controlText.setOpacity(.4);
         pane1.getChildren().add(controlText);
 
-        Text controlText1 = new Text((WIDTH/2 - 60), 480, "Space:  Shoot");
+        Text controlText1 = new Text((WIDTH/2 - 170), 480, "Space: Shoot    Shift: Hyperspace Jump");
         controlText1.setFill(Color.WHITE);
         controlText1.setStyle("-fx-font: 20 arial;");
         controlText1.setOpacity(.4);
@@ -57,7 +59,6 @@ public class Controls {
         List<Projectile> shoots = new ArrayList<>();
 
         Map<KeyCode, Boolean> pressedKeys = new HashMap<>();
-        //Scene scene1 = new Scene(pane1);
         scene.setOnKeyPressed(event -> {
             pressedKeys.put(event.getCode(), Boolean.TRUE);
         });
@@ -79,8 +80,12 @@ public class Controls {
         }
         asteroids.forEach(asteroid -> pane1.getChildren().add(asteroid.getCharacter()));
 
-        new AnimationTimer() {
+        List <AbstractGameElement> characters = new ArrayList<>();
+        for (Asteroid asteroid : asteroids) {
+            characters.add(asteroid);
+        }
 
+        new AnimationTimer() {
             @Override
             public void handle(long now) {
 
@@ -103,6 +108,13 @@ public class Controls {
                     ship.accelerate();
                 }
 
+                if (framesSinceLastHyperJump > 20){
+                    if (pressedKeys.getOrDefault(KeyCode.SHIFT, false)||pressedKeys.getOrDefault(KeyCode.SHIFT, false)) {
+                        ship.moveSomewhereSafe(characters, 100);
+                        framesSinceLastHyperJump = 0;
+                    }
+                }
+
                 boolean moveAndShootPressed = (pressedKeys.getOrDefault(KeyCode.D, false) || pressedKeys.getOrDefault(KeyCode.A, false) || pressedKeys.getOrDefault(KeyCode.W, false))
                         && pressedKeys.getOrDefault(KeyCode.SPACE, false);
 
@@ -111,24 +123,16 @@ public class Controls {
                     // Check if enough frames have passed since the last shot
                     if (framesSinceLastShot >= 16) {
                         // When shooting the bullet in the same direction as the ship
-                        Projectile shot = new Projectile((int) ship.getCharacter().getTranslateX(),
-                                (int) ship.getCharacter().getTranslateY(), ProjectileType.PLAYER);
+                        Projectile shot = ship.shoot();
 
-                        shot.setSpeed(ship.getSpeed());
-
-                        shot.getCharacter().setRotate(ship.getCharacter().getRotate());
                         shoots.add(shot);
-                        shot.move();
                         pane1.getChildren().add(shot.getCharacter());
-
-                        // Reset the framesSinceLastShot counter
                         framesSinceLastShot = 0;
                     }
-                    //pressedKeys.clear();
                 }
-
                 // Increment the framesSinceLastShot counter on each frame
                 framesSinceLastShot++;
+                framesSinceLastHyperJump++;
 
                 ship.move();
                 asteroids.forEach(asteroid -> asteroid.move());
@@ -144,7 +148,6 @@ public class Controls {
                         }
                     }
                     });
-
 
                 Iterator<Projectile> iterator = shoots.iterator();
                 while(iterator.hasNext()) {
@@ -169,16 +172,16 @@ public class Controls {
                         asteroids.remove(delete);
                         pane1.getChildren().remove(delete.getCharacter());
 
-                        // Count Level up
                     });
                     return true;
                 }).toList();
 
-                // Add points,HP and level
                 destroy_asteroid.forEach(shot -> {
                     pane1.getChildren().remove(shot.getCharacter());
                     shoots.remove(shot);
                 });
+
+                shoots.forEach(shot -> shot.move());
             }
 
         }.start();
@@ -186,7 +189,6 @@ public class Controls {
         stage.setScene(scene);
         stage.show();
         stage.setResizable(false);
-
     }
 }
 

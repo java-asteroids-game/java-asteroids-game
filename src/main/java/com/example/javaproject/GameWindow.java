@@ -46,6 +46,8 @@ public class GameWindow {
     List <AbstractGameElement> characters = new ArrayList<>();
     PlayerShip ship = new PlayerShip(WIDTH / 2, HEIGHT / 2);
     EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2);
+    public boolean isCheating = false;
+
 
     private List<Text> setupUITextElements(Pane pane){
         // Show current points ,current level, and current HP
@@ -74,15 +76,15 @@ public class GameWindow {
         return progressBar;
     }
     private void asteroidsHitUpdatePoints() {
-        points.set(points.get() + 100);
-
-        if (points.get() % 1000 == 0) {
-            level.incrementAndGet();
-            AsteroidType.increaseSpeeds(0.2);
-        }
-
-        if (points.get()% 5000 == 0){
-            HP.incrementAndGet();
+        if(!isCheating){
+            points.set(points.get() + 100);
+            if (points.get() % 1000 == 0) {
+                level.incrementAndGet();
+                AsteroidType.increaseSpeeds(0.2);
+            }
+            if (points.get()% 5000 == 0){
+                HP.incrementAndGet();
+            }
         }
     }
     private void updateGameInformation(List<Text> textElements) {
@@ -93,7 +95,9 @@ public class GameWindow {
         textElements.forEach(Node::toFront);
     }
     private void cheat(Pane pane){
+        isCheating = true;
         //creates text to display when user cheats
+
         Text cheatText = new Text("CHEATERS LOSE THEIR POINTS");
         cheatText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
         cheatText.setFill(Color.RED);
@@ -162,6 +166,7 @@ public class GameWindow {
             Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), AsteroidType.LARGE);
             asteroids.add(asteroid);
         }
+        isCheating = false;
 
         Asteroid asteroid_special = new Asteroid(WIDTH / 2, 500, AsteroidType.SPECIAL);
         asteroids.add(asteroid_special);
@@ -213,7 +218,7 @@ public class GameWindow {
             }
 
             private void handleShipShooting() {
-                if (framesSinceLastShot >= 15 && shoots.size() < 6) {
+                if (framesSinceLastShot >= 15 && shoots.size() < 4) {
                     // When shooting the bullet in the same direction as the ship
                     Projectile shot = ship.shoot();
                     shoots.add(shot);
@@ -245,17 +250,17 @@ public class GameWindow {
                 DoubleBinding progressBinding = Bindings.createDoubleBinding(() -> {
                     if (observableShots.size() == 0) {
                         return 0.0;
-                    } else if (observableShots.size() == 6) {
+                    } else if (observableShots.size() == 4) {
                         return 1.0;
                     } else {
-                        return (double) observableShots.size() / 6;
+                        return (double) observableShots.size() / 4;
                     }
                 }, observableShots);
                 progressBar.progressProperty().bind(progressBinding);
             }
 
             private void handleHyperJump() {
-                if (framesSinceLastHyperJump >= 10){
+                if (framesSinceLastHyperJump >= 20){
                     moveShipToSafety();
                     framesSinceLastHyperJump = 0;
                 }
@@ -337,6 +342,7 @@ public class GameWindow {
                                     pane.getChildren().add(asteroid.getCharacter());
                                 });
                             });
+
                             // Handle points update
                             asteroidsHitUpdatePoints();
 
