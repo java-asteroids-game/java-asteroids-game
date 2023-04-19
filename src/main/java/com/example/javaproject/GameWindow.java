@@ -46,6 +46,8 @@ public class GameWindow {
     List <AbstractGameElement> characters = new ArrayList<>();
     PlayerShip ship = new PlayerShip(WIDTH / 2, HEIGHT / 2);
     EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2);
+    public boolean isCheating = false;
+
 
     private List<Text> setupUITextElements(Pane pane){
         // Show current points ,current level, and current HP
@@ -74,15 +76,15 @@ public class GameWindow {
         return progressBar;
     }
     private void asteroidsHitUpdatePoints() {
-        points.set(points.get() + 100);
-
-        if (points.get() % 1000 == 0) {
-            level.incrementAndGet();
-            AsteroidType.increaseSpeeds(0.2);
-        }
-
-        if (points.get()% 5000 == 0){
-            HP.incrementAndGet();
+        if(!isCheating){
+            points.set(points.get() + 100);
+            if (points.get() % 1000 == 0) {
+                level.incrementAndGet();
+                AsteroidType.increaseSpeeds(0.2);
+            }
+            if (points.get()% 5000 == 0){
+                HP.incrementAndGet();
+            }
         }
     }
     private void updateGameInformation(List<Text> textElements) {
@@ -93,7 +95,9 @@ public class GameWindow {
         textElements.forEach(Node::toFront);
     }
     private void cheat(Pane pane){
+        isCheating = true;
         //creates text to display when user cheats
+
         Text cheatText = new Text("CHEATERS LOSE THEIR POINTS");
         cheatText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
         cheatText.setFill(Color.RED);
@@ -119,6 +123,9 @@ public class GameWindow {
 //        );
 //        cheatBlink.setCycleCount(Timeline.INDEFINITE);
 //        cheatBlink.play();
+//        ship.setInvincible(true);
+
+
 
 
 
@@ -170,6 +177,7 @@ public class GameWindow {
             Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), AsteroidType.LARGE);
             asteroids.add(asteroid);
         }
+        isCheating = false;
 
         Asteroid asteroid_special = new Asteroid(WIDTH / 2, 500, AsteroidType.SPECIAL);
         asteroids.add(asteroid_special);
