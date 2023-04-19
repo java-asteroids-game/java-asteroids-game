@@ -1,5 +1,7 @@
 package com.example.javaproject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Asteroid extends AbstractGameElement {
@@ -38,6 +40,27 @@ public class Asteroid extends AbstractGameElement {
     public double Move_speed_up(){
         this.move_speed=0.05;
         return this.move_speed;
+    }
+
+    public List<Asteroid> onDestroy(){
+
+        List<Asteroid> newAsteroids = new ArrayList<Asteroid>();
+        AsteroidType newAsteroidType = null;
+
+        switch (this.getType()) {
+            case SPECIAL -> newAsteroidType = AsteroidType.LARGE;
+            case LARGE -> newAsteroidType = AsteroidType.MEDIUM;
+            case MEDIUM -> newAsteroidType = AsteroidType.SMALL;
+            case SMALL -> {}
+        }
+
+        if (newAsteroidType != null){
+            for (int i = 0; i < 2; i++){
+                newAsteroids.add(new Asteroid((int) this.getCharacter().getTranslateX(), (int) this.character.getTranslateY(), newAsteroidType));
+            }
+        }
+
+        return newAsteroids;
     }
 
     public AsteroidType getType(){

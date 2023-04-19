@@ -20,3 +20,7 @@ Tania	3500
 Tania	800
 Tania	7400
 Tania	13400
+Tania	6700
+t	1900
+t	9000
+Tania	6700

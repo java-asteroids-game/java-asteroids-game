@@ -111,14 +111,6 @@ public class GameWindow {
         //sets the cycle as indefinite - remains until gameover
         cheatTimeline.setCycleCount(Timeline.INDEFINITE);
         cheatTimeline.play();
-        // Ship blinks for god mode
-//        Timeline cheatBlink = new Timeline(
-//                new KeyFrame(Duration.ZERO, e -> ship.getCharacter().setVisible(true)),
-//                new KeyFrame(Duration.millis(100), e -> ship.getCharacter().setVisible(false)),
-//                new KeyFrame(Duration.millis(200), e -> ship.getCharacter().setVisible(true))
-//        );
-//        cheatBlink.setCycleCount(Timeline.INDEFINITE);
-//        cheatBlink.play();
 
 
 
@@ -270,7 +262,7 @@ public class GameWindow {
             }
 
             private void handleCollisions() {
-                manageBulletCollisions();
+                manageBulletAsteroidCollisions();
                 manageAlienBulletCollisions();
                 manageAsteroids();
             }
@@ -306,7 +298,7 @@ public class GameWindow {
                 }
             }
 
-            private void manageBulletCollisions() {
+            private void manageBulletAsteroidCollisions() {
                 List<Asteroid> destroyedAsteroids;
 
                 //iterator required to avoid concurrent modification exception (removing item from list while iterating through it)
@@ -339,26 +331,12 @@ public class GameWindow {
                             destroyedAsteroids.forEach(delete -> {
                                 asteroids.remove(delete);
                                 pane.getChildren().remove(delete.getCharacter());
-                                for (int i = 0; i < 2; i++) {
-                                    if (delete.getType() == AsteroidType.SPECIAL) {
-                                        Asteroid asteroid = new Asteroid((int) delete.getCharacter()
-                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(), AsteroidType.LARGE);
-                                        asteroids.add(asteroid);
-                                        pane.getChildren().add(asteroid.getCharacter());
-                                    } else if (delete.getType() == AsteroidType.LARGE) {
-                                        Asteroid asteroid = new Asteroid((int) delete.getCharacter()
-                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(), AsteroidType.MEDIUM);
-                                        asteroids.add(asteroid);
-                                        pane.getChildren().add(asteroid.getCharacter());
-                                    } else if (delete.getType() == AsteroidType.MEDIUM) {
-                                        Asteroid asteroid = new Asteroid((int) delete.getCharacter()
-                                                .getTranslateX(), (int) delete.getCharacter().getTranslateY(), AsteroidType.SMALL);
-                                        asteroids.add(asteroid);
-                                        pane.getChildren().add(asteroid.getCharacter());
-                                    }
-                                }
+                                List<Asteroid>  newAsteroids = delete.onDestroy();
+                                newAsteroids.forEach(asteroid -> {
+                                    asteroids.add(asteroid);
+                                    pane.getChildren().add(asteroid.getCharacter());
+                                });
                             });
-
                             // Handle points update
                             asteroidsHitUpdatePoints();
 
