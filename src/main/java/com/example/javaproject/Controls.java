@@ -108,7 +108,7 @@ public class Controls {
                     ship.accelerate();
                 }
 
-                if (framesSinceLastHyperJump > 10){
+                if (framesSinceLastHyperJump > 20){
                     if (pressedKeys.getOrDefault(KeyCode.SHIFT, false)||pressedKeys.getOrDefault(KeyCode.SHIFT, false)) {
                         ship.moveSomewhereSafe(characters, 100);
                         framesSinceLastHyperJump = 0;

@@ -271,7 +271,7 @@ public class GameWindow {
             }
 
             private void handleHyperJump() {
-                if (framesSinceLastHyperJump >= 10){
+                if (framesSinceLastHyperJump >= 20){
                     moveShipToSafety();
                     framesSinceLastHyperJump = 0;
                 }
