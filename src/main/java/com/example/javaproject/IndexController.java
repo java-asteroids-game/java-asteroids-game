@@ -23,7 +23,7 @@ public class IndexController {
     @FXML
     void mouseClickScore(MouseEvent event) {
         Stage stage = new Stage(); // Create a new Stage instance
-        StartPane.getInstance().scorelist(stage); // Pass the Stage instance to the scorelist() method
+        StartPane.getInstance().scoreList(stage); // Pass the Stage instance to the scorelist() method
 
 //        Pane.getInstance().scorelist();
     }
