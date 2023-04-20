@@ -31,7 +31,7 @@ public class GameWindow extends BaseGame{
     int framesSinceLastGodMode = 0;
 
     // Declare alien and alienShoots information
-    EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2);
+    EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2, ship);
     List<Projectile> alienShoots = new ArrayList<>();
 
     public boolean isCheating = false;
@@ -97,7 +97,7 @@ public class GameWindow extends BaseGame{
     private void handleAlienShooting() {
         if (alienShip.isAlive()) {
             if (framesSinceLastAlienShot >= 100) {
-                Projectile alienShot = alienShip.shootAtTarget(ship);
+                Projectile alienShot = alienShip.shoot();
                 alienShoots.add(alienShot);
                 pane.getChildren().add(alienShot.getCharacter());
                 // Reset the framesSinceLastShot counter

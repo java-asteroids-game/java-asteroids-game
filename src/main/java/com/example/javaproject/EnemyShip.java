@@ -10,11 +10,13 @@ public class EnemyShip extends AbstractGameElement {
     private long createdAt = currentTimeMillis();
     public double speed;
     private boolean alive = false;
+    private final PlayerShip target;
 
     //creates a green polygon
-    public EnemyShip(int x, int y) {
+    public EnemyShip(int x, int y, PlayerShip playerShip) {
         super(new CharacterFactory().createEnemyShip(), x, y);
         this.character.setFill(javafx.scene.paint.Color.GREEN);
+        this.target = playerShip;
     }
 
     //getter method for the created time variable
@@ -51,13 +53,13 @@ public class EnemyShip extends AbstractGameElement {
     }
 
 
-    public Projectile shootAtTarget(PlayerShip target) {
+    public Projectile shoot() {
         // Set location to enemy ship location
         Projectile alienShoot = new Projectile((int) this.getCharacter().getTranslateX(), (int) this.getCharacter().getTranslateY(), ProjectileType.ALIEN);
 
         // Calculate angle between alien ship and target ship
-        double angle = Math.toDegrees(Math.atan2(target.getCharacter().getTranslateY() - alienShoot.getCharacter().getTranslateY(),
-                target.getCharacter().getTranslateX() - alienShoot.getCharacter().getTranslateX()));
+        double angle = Math.toDegrees(Math.atan2(this.target.getCharacter().getTranslateY() - alienShoot.getCharacter().getTranslateY(),
+                this.target.getCharacter().getTranslateX() - alienShoot.getCharacter().getTranslateX()));
 
         // Set the rotation of the projectile
         alienShoot.getCharacter().setRotate(angle);

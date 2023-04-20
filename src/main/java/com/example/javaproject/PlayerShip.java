@@ -5,7 +5,7 @@ import javafx.scene.shape.Shape;
 
 import java.util.List;
 
-public class PlayerShip extends AbstractGameElement {
+public class PlayerShip extends AbstractGameElement implements Ship {
 
     private boolean invincible = false;
     public PlayerShip(int x, int y) {
