@@ -1,5 +1,9 @@
 package com.example.javaproject;
 
+import javafx.scene.layout.Pane;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Asteroid extends AbstractGameElement {
@@ -16,6 +20,17 @@ public class Asteroid extends AbstractGameElement {
         this.move_speed = type.getSpeed();
         super.getCharacter().setRotate(rnd.nextInt(360));
         this.rotationalMovement = 0.5 - rnd.nextDouble();
+    }
+
+    public static void createAsteroids(int numOfAsteroids, int width, int height, Pane pane1) {
+        List<Asteroid> asteroids = new ArrayList<>();
+        for (int i = 0; i < numOfAsteroids; i++) {
+            Random rnd= new Random();
+            Asteroid asteroid = new Asteroid(rnd.nextInt(width / 3), rnd.nextInt(height), AsteroidType.SMALL);
+            asteroids.add(asteroid);
+            asteroids.forEach(asteroid2 -> pane1.getChildren().add(asteroid2.getCharacter()));
+        }
+
     }
 
     public void move() {

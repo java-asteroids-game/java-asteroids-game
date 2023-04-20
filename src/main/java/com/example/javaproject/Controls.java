@@ -19,7 +19,7 @@ public class Controls {
     static int framesSinceLastHyperJump = 0;
 
     public static void load(Stage stage) {
-        javafx.scene.layout.Pane pane1 = new Pane();
+        Pane pane1 = new Pane();
         pane1.setPrefSize(WIDTH, HEIGHT);
         pane1.setStyle("-fx-background-color: black");
 
@@ -72,22 +72,31 @@ public class Controls {
             pressedKeys.put(event.getCode(), Boolean.TRUE);
         });
 
+//        Asteroid.createAsteroids(12, WIDTH, HEIGHT, pane1);
+
+//        List<Asteroid> asteroids = new ArrayList<>();
+//        for (int i = 0; i < 12; i++) {
+//            Random rnd= new Random();
+//            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), AsteroidType.SMALL);
+//            asteroids.add(asteroid);
+//        }
+//        asteroids.forEach(asteroid -> pane1.getChildren().add(asteroid.getCharacter()));
+//
+//        List <AbstractGameElement> characters = new ArrayList<>();
+//        for (Asteroid asteroid : asteroids) {
+//            characters.add(asteroid);
+//        }
+
         List<Asteroid> asteroids = new ArrayList<>();
-        for (int i = 0; i < 12; i++) {
-            Random rnd= new Random();
-            Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), AsteroidType.SMALL);
-            asteroids.add(asteroid);
-        }
-        asteroids.forEach(asteroid -> pane1.getChildren().add(asteroid.getCharacter()));
-
-        List <AbstractGameElement> characters = new ArrayList<>();
-        for (Asteroid asteroid : asteroids) {
-            characters.add(asteroid);
-        }
-
         new AnimationTimer() {
             @Override
             public void handle(long now) {
+                Asteroid.createAsteroids(12, WIDTH, HEIGHT, pane1);
+
+                List <AbstractGameElement> characters = new ArrayList<>();
+                for (Asteroid asteroid : asteroids) {
+                    characters.add(asteroid);
+                }
 
                 if (asteroids.size() < 10) {
                     Random rnd= new Random();
@@ -136,6 +145,7 @@ public class Controls {
 
                 ship.move();
                 asteroids.forEach(asteroid -> asteroid.move());
+
                 asteroids.forEach(asteroid -> {
                     if (ship.collide(asteroid)) {
                         ship.character.setTranslateX((double) WIDTH / 2);
