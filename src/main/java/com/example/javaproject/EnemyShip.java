@@ -5,12 +5,14 @@ import javafx.scene.shape.Shape;
 
 import static java.lang.System.currentTimeMillis;
 
-public class EnemyShip extends AbstractGameElement {
+public class EnemyShip extends AbstractGameElement implements Ship{
 
     private long createdAt = currentTimeMillis();
     public double speed;
     private boolean alive = false;
     private final PlayerShip target;
+
+    private PlayerShip target;
 
     //creates a green polygon
     public EnemyShip(int x, int y, PlayerShip playerShip) {
@@ -69,6 +71,21 @@ public class EnemyShip extends AbstractGameElement {
         return alienShoot;
     }
 
+    public Projectile shoot() {
+        // Set location to enemy ship location
+        Projectile alienShoot = new Projectile((int) this.getCharacter().getTranslateX(), (int) this.getCharacter().getTranslateY(), ProjectileType.ALIEN);
+
+        // Calculate angle between alien ship and target ship
+        double angle = Math.toDegrees(Math.atan2(this.target.getCharacter().getTranslateY() - alienShoot.getCharacter().getTranslateY(),
+                this.target.getCharacter().getTranslateX() - alienShoot.getCharacter().getTranslateX()));
+
+        // Set the rotation of the projectile
+        alienShoot.getCharacter().setRotate(angle);
+
+        alienShoot.setSpeed(this.getSpeed());
+
+        return alienShoot;
+    }
 
     public boolean collide(AbstractGameElement other) {
         Shape collisionArea = Shape.intersect(this.character, other.getCharacter());

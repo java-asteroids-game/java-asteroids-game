@@ -42,7 +42,6 @@ public class PlayerShip extends AbstractGameElement implements Ship {
     public void setInvincible(boolean invincible) {
         this.invincible = invincible;
 
-
     }
     public boolean collide(AbstractGameElement other) {
         if (invincible) {
@@ -82,6 +81,5 @@ public class PlayerShip extends AbstractGameElement implements Ship {
         } while (this.isPositionNotSafe(characters, safeDistance));
 
     }
-
 
 }
