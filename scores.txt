@@ -18,6 +18,10 @@ Tania	0
 Tania	9300
 Tania	3500
 Tania	800
+Tania	7400
+Tania	13400
+yuntao	6800
+yuntao	5600
 Tania	1300
 Tania	4700
 Tania	5800
@@ -25,3 +29,4 @@ dt	6400
 Tania	1100
 Tania	1100
 Tania	1500
+yuntao	8900
