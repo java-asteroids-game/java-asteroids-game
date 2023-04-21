@@ -19,7 +19,7 @@ public class ScoreWindow {
     public static final int WIDTH = 500;
     public static final int HEIGHT = 400;
 
-    public static void load(Stage stage) {
+    public void load(Stage stage) {
         Scene scene = createHighScoreScene(WIDTH, HEIGHT);
         stage.setScene(scene); // Set the Scene to the Stage
         stage.setTitle("High Score!!!"); // Set the title of the window

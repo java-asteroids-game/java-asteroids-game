@@ -22,15 +22,15 @@ public class Asteroid extends AbstractGameElement {
         this.rotationalMovement = 0.5 - rnd.nextDouble();
     }
 
-    public static void createAsteroids(int numOfAsteroids, int width, int height, Pane pane1) {
+    public static List<Asteroid> createAsteroids(int numOfAsteroids, Pane pane1) {
         List<Asteroid> asteroids = new ArrayList<>();
         for (int i = 0; i < numOfAsteroids; i++) {
             Random rnd= new Random();
-            Asteroid asteroid = new Asteroid(rnd.nextInt(width / 3), rnd.nextInt(height), AsteroidType.SMALL);
+            Asteroid asteroid = new Asteroid(rnd.nextInt(GameWindow.WIDTH), rnd.nextInt(GameWindow.HEIGHT), AsteroidType.SMALL);
             asteroids.add(asteroid);
-            asteroids.forEach(asteroid2 -> pane1.getChildren().add(asteroid2.getCharacter()));
         }
 
+        return asteroids;
     }
 
     public void move() {
@@ -53,6 +53,27 @@ public class Asteroid extends AbstractGameElement {
     public double Move_speed_up(){
         this.move_speed=0.05;
         return this.move_speed;
+    }
+
+    public List<Asteroid> onDestroy(){
+
+        List<Asteroid> newAsteroids = new ArrayList<Asteroid>();
+        AsteroidType newAsteroidType = null;
+
+        switch (this.getType()) {
+            case SPECIAL -> newAsteroidType = AsteroidType.LARGE;
+            case LARGE -> newAsteroidType = AsteroidType.MEDIUM;
+            case MEDIUM -> newAsteroidType = AsteroidType.SMALL;
+            case SMALL -> {}
+        }
+
+        if (newAsteroidType != null){
+            for (int i = 0; i < 2; i++){
+                newAsteroids.add(new Asteroid((int) this.getCharacter().getTranslateX(), (int) this.character.getTranslateY(), newAsteroidType));
+            }
+        }
+
+        return newAsteroids;
     }
 
     public AsteroidType getType(){

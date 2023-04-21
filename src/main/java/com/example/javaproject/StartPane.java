@@ -11,8 +11,7 @@ public class StartPane {
 
     private static StartPane instance = new StartPane();
     private Stage stage;
-    private GameWindow game;
-    private ScoreWindow scoreWindow = new ScoreWindow();
+
     private StartPane(){}
 
     public static StartPane getInstance(){
@@ -35,16 +34,18 @@ public class StartPane {
     }
 
     public void gameStart() {
-        game = new GameWindow();
+        GameWindow game = new GameWindow();
         game.load(stage,3);
     }
 
-    public void scorelist(Stage stage) {
+    public void scoreList(Stage stage) {
+        ScoreWindow scoreWindow = new ScoreWindow();
         scoreWindow.load(stage);
     }
 
     public void showControls(Stage stage) {
-        Controls.load(stage);
+        ControlsWindow controls = new ControlsWindow();
+        controls.load(stage, 12);
     }
 }
 
