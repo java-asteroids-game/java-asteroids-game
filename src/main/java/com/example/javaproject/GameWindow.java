@@ -81,7 +81,9 @@ public class GameWindow extends BaseGame{
     @Override
     protected void handleShipShooting() {
         super.handleShipShooting();
+    }
 
+    protected void handleProgressBar(){
         ObservableList<Projectile> observableShots = FXCollections.observableList(shoots);
         DoubleBinding progressBinding = Bindings.createDoubleBinding(() -> {
             if (observableShots.size() == 0) {
@@ -94,6 +96,7 @@ public class GameWindow extends BaseGame{
         }, observableShots);
         progressBar.progressProperty().bind(progressBinding);
     }
+
     private void handleAlienShooting() {
         if (alienShip.isAlive()) {
             if (framesSinceLastAlienShot >= 100) {
@@ -164,6 +167,8 @@ public class GameWindow extends BaseGame{
         super.animationHandle();
         handleAlienShooting();
         updateGameInformation(UITextElements);
+        handleProgressBar();
+
     }
     private void spawnSpecialAsteroid(){
         Asteroid asteroid_special = new Asteroid(WIDTH / 2, 500, AsteroidType.SPECIAL);
