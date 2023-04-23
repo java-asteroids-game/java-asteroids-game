@@ -4,13 +4,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 
 public class CharacterFactory {
-    // Static variable to allows us to adjust the scale of the UI elements if needed
 
+    // Method that returns a polygon for use by the ship class
     public Polygon createShip() {
 
+        // We can change the scale of the ship to make it better integrate
+        // with other shapes on the game
         final double SCALE = 2;
 
-        // Construct a shape centered around the position point passed in, multiplied by the global scale
+        // List of points to create the polygon
         Polygon shipShape = new Polygon(
                 -3.8 * SCALE,	-4.5 * SCALE,
                 -3.05 * SCALE,	-2.7 * SCALE,
@@ -44,12 +46,15 @@ public class CharacterFactory {
         shipShape.setStroke(Color.WHITE);
         shipShape.setFill(Color.DARKGRAY);
 
-        // Return ship shape
+        // Return ship shape polygon
         return shipShape;
     }
 
+    // Method that returns a polygon for use by the asteroid class
+    // Based on the size property of the asteroid type
     public Polygon createAsteroid(AsteroidType type) {
-        
+
+        // Get the size of the asteroid from the AsteroidType enum
         double asteroidSize = type.getSize();
 //
         // Declare the new polygon, asteroidShape
@@ -64,8 +69,11 @@ public class CharacterFactory {
         return asteroidShape;
     }
 
+    // Method that returns a polygon for use by the projectile class
     public Polygon createBullet() {
 
+        // We can change the scale of the projectile to make it better integrate
+        // with other shapes on the game
         final double SCALE = 2;
 
         // Construct a shape centered around the position point passed in, multiplied by the global scale
@@ -85,8 +93,11 @@ public class CharacterFactory {
         return bulletShape;
     }
 
+    // Method that returns a polygon for use by the EnemyShip class
     public Polygon createEnemyShip() {
 
+        // We can change the scale of the alien ship to make it better integrate
+        // with other shapes on the game
         final double SCALE = 2;
 
         // Construct a shape centered round the position point passe in, multiplied by the global scale
