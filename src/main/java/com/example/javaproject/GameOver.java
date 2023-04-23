@@ -80,7 +80,7 @@ public class GameOver {
         playerNameField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 displayHighScores(playerNameField);
-                Scene highScoresScene = new ScoreWindow().showHighScoresScreen(stage);
+                Scene highScoresScene = new ScoreWindow().createHighScoreScene(GameWindow.WIDTH, GameWindow.HEIGHT);
                 stage.setScene(highScoresScene);
             }
         });

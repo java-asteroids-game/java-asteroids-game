@@ -33,11 +33,9 @@ public class ScoreWindow {
         stage.show(); // Display the Stage
     }
 
-    public Scene showHighScoresScreen(Stage stage){
-        return createHighScoreScene(GameWindow.WIDTH, GameWindow.HEIGHT);
-    }
 
-    private static Scene createHighScoreScene(int width, int height){
+    //used to create the high score pane using methods from ScoreManager
+    public static Scene createHighScoreScene(int width, int height){
         StackPane scorePane = new StackPane();
         scorePane.setPrefSize(width, height);
         scorePane.setStyle("-fx-background-color: black");
