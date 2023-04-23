@@ -6,15 +6,14 @@ import javafx.scene.shape.Shape;
 
 public class Projectile extends AbstractGameElement {
 
-    private static final int MAX_FLIGHT_TIME = 180;
-    public  boolean alive;
     public double speed;
+    public final ProjectileType type;
 
     public Projectile(int x, int y, ProjectileType type) {
         super(new CharacterFactory().createBullet(), x, y);
         this.character.setFill(Color.valueOf(type.getColor()));
         this.character.setStroke(Color.valueOf(type.getColor()));
-        this.alive = true;
+        this.type = type;
     }
 
     public void setSpeed(double speed) {
@@ -41,7 +40,6 @@ public class Projectile extends AbstractGameElement {
         if (this.getCharacter().getTranslateX() < 0 || this.getCharacter().getTranslateX() > GameWindow.WIDTH ||
                 this.getCharacter().getTranslateY() < 0 || this.getCharacter().getTranslateY() > GameWindow.HEIGHT) {
             // Remove the projectile from the game window
-            this.Alive = false;
             return true;
         }
         return false;

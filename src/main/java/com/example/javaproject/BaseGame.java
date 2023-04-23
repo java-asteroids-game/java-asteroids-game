@@ -10,43 +10,66 @@ import java.util.*;
 
 public abstract class BaseGame {
 
+    // BaseGame must have a stage
     Stage stage;
-    //game window size
+
+    // Size for both the GameWindow and controlWindow
     public static final int WIDTH = 960;
     public static final int HEIGHT = 600;
 
+    // Initialize frame counters
     int framesSinceLastShot = 15;
     int framesSinceLastRandomAsteroid = 0;
     int framesSinceLastHyperJump = 0;
 
+    // Initialize characters on the screen
     List<Asteroid> asteroids = new ArrayList<>();
     List<Projectile> shoots = new LinkedList<>();
     List<AbstractGameElement> characters = new ArrayList<>();
     PlayerShip ship = new PlayerShip(WIDTH / 2, HEIGHT / 2);
+
+    // Initialize the number of asteroids
     int numAsteroids;
 
+    // Intialize the pane, scene, and keys hashnap
     Pane pane = new Pane();
     Scene scene;
     Map<KeyCode, Boolean> pressedKeys = new HashMap<>();
+
+    // Initialize list of UI elements
     List<Text> UITextElements;
 
+
+    // Setup game method. This method will be called in the subclasses load method
     protected void setupGame(int numAsteroids){
+        // Initialize a new pane with the game width and height
         pane = new Pane();
         pane.setPrefSize(WIDTH, HEIGHT);
         pane.setStyle("-fx-background-color: black");
+        // Create a new scene
         scene = new Scene(pane);
+        // Call the method to set up the key input hashmap
         populateKeyHashMap(scene);
+        // Call the method that has been implemented by the subclass to set up UI elements
         UITextElements = setupUITextElements(pane);
+        // Add the ship to the pane
         pane.getChildren().add(ship.getCharacter());
-
+        // Reset the asteroid speeds
         AsteroidType.resetSpeeds();
+        // Spawn the required number of asteroids
         spawnAsteroids(numAsteroids);
     }
 
+
+    // Abstract method. All subclasses of the BaseGame class must have a setupUIText Elements
+    // which will create text elements and place them in the pane
     protected abstract List<Text> setupUITextElements(Pane pane);
 
+    // Abstract method. All subclasses of the BaseGame class must have a load method with a
+    // stage and a number of asteroids
     protected abstract void load(Stage stage, int AsteroidCount);
 
+    // Method to capture all methods that should be called when a scene is being animated
     protected void animationHandle() {
         handleKeyInput();
         handleMoveObjects();
@@ -54,6 +77,8 @@ public abstract class BaseGame {
         handleUpdateFrameCounters();
     }
 
+    // Adds keys being pressed on the scene to the pressedKeys hashmap
+    // Allows for holding the keys
     protected void populateKeyHashMap(Scene scene){
         scene.setOnKeyPressed(event -> {
             pressedKeys.put(event.getCode(), Boolean.TRUE);
@@ -63,6 +88,7 @@ public abstract class BaseGame {
          });
     }
 
+    // Method to take key input and call other methods accordingly.
     protected void handleKeyInput() {
 
         // ^ is the same as XOR
@@ -87,6 +113,7 @@ public abstract class BaseGame {
         }
     }
 
+    // Method to spawn asteroids in the game pane.
     protected void spawnAsteroids(int asteroidCount){
         for (int i = 0; i < asteroidCount; i++) {
             Random rnd= new Random();
@@ -97,6 +124,7 @@ public abstract class BaseGame {
     }
 
 
+    // Method to handle ship shooting, makes sure there aren't more than 4 bullets on the screen at a time.
     protected void handleShipShooting() {
         if (framesSinceLastShot >= 15 && shoots.size() < 4) {
             // When shooting the bullet in the same direction as the ship
@@ -110,18 +138,25 @@ public abstract class BaseGame {
 
     }
 
+    // Method for handling hyper jump, calls the move ship to safety function and prevents hyperjumps
+    // with less than 20 frames in between.
     protected void handleHyperJump() {
         if (framesSinceLastHyperJump >= 20) {
             handleMoveShipToSafety();
+            // Reset the framesSinceLastHyperJump counter
             framesSinceLastHyperJump = 0;
         }
     }
 
+    // Calls game methods to handle collisions. Checks for asteroid bullet collisions
+    // and asteroid collisions with the ship
     protected void handleCollisions() {
         manageBulletCollisions();
         manageAsteroids();
     }
 
+    // Checks if a bullet has collided with an asteroid and removes bullets that have gone out
+    // of bounds of the screen.
     protected void manageBulletCollisions() {
 
         //iterator required to avoid concurrent modification exception (removing item from list while iterating through it)
@@ -136,9 +171,10 @@ public abstract class BaseGame {
                 // else update the position of the projectile
             } else {
                 shoot.move();
-
+                // Get the number of asteroids that have been destroyed by bullets
                 int deadAsteroidCount = checkBulletCollisions(shoot);
 
+                // If any of the asteroids have been destroyed
                 if (deadAsteroidCount > 0) {
                     // Remove the projectile that collided with the asteroid
                     projectileIterator.remove();
@@ -148,6 +184,8 @@ public abstract class BaseGame {
         }
     }
 
+    // Method that checks if bullets have collided with asteroids. Returns the number
+    // of asteroids destroyed so that the manageBulletCollisions method knows which bullets to delete.
     protected int checkBulletCollisions(Projectile shoot) {
         List<Asteroid> destroyedAsteroids;
 
@@ -161,6 +199,7 @@ public abstract class BaseGame {
             destroyedAsteroids.forEach(delete -> {
                 asteroids.remove(delete);
                 pane.getChildren().remove(delete.getCharacter());
+                // Call the asteroids onDestroy method, which returns smaller asteroids
                 List<Asteroid> newAsteroids = delete.onDestroy();
                 newAsteroids.forEach(asteroid -> {
                     asteroids.add(asteroid);
@@ -168,20 +207,17 @@ public abstract class BaseGame {
                 });
             });
         }
-
         return destroyedAsteroids.size();
     }
 
+    // Manage asteroids, spawn them as necessary and
     protected void manageAsteroids() {
         if (asteroids.isEmpty()) {
             int newNumAsteroids = numAsteroids + 1;
-            for (int i = 0; i < newNumAsteroids; i++) {
-                Random rnd = new Random();
-                Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT), AsteroidType.LARGE);
-                asteroids.add(asteroid);
-                pane.getChildren().add(asteroid.getCharacter());
-            }
+            spawnAsteroids(newNumAsteroids);
         }
+
+        // Generate a new random asteroid
         if (framesSinceLastRandomAsteroid > 10 && Math.random() < 0.005) {
             double rnd_2 = Math.random() * 1000;
             Asteroid asteroid = new Asteroid((int) rnd_2 % WIDTH, 0, AsteroidType.MEDIUM);
@@ -193,18 +229,23 @@ public abstract class BaseGame {
         }
     }
 
+    // Increment all the frameCounters, call this method in the animation timer
     protected void handleUpdateFrameCounters() {
         framesSinceLastShot++;
         framesSinceLastRandomAsteroid++;
         framesSinceLastHyperJump++;
     }
 
+    // Handle the movement of all of the objects on screen
+    // Calls the move methods for all of the objects
     protected void handleMoveObjects() {
         ship.move();
         shoots.forEach(shot -> shot.move());
         asteroids.forEach(asteroid -> asteroid.move());
     }
 
+    // Moves the ship to a safe space on the screen
+    // Creates a list of all the characters to avoid, and calls the moveSomewhereSafe method on the ship
     protected void handleMoveShipToSafety() {
         characters.addAll(asteroids);
         ship.moveSomewhereSafe(characters, 150);
@@ -212,81 +253,3 @@ public abstract class BaseGame {
     }
 
 }
-
-
-
-
-
-
-
-
-//            private void handleCheating(){
-//                if  (level.get() >= 3 && framesSinceLastGodMode > 250){
-//                    cheat(pane);
-//                    framesSinceLastGodMode = 0;
-//                }
-//            }
-
-//            private void handleAlienShooting() {
-//                if (alienShip.isAlive()) {
-//                    if (framesSinceLastAlienShot >= 100) {
-//                        Projectile alienShot = alienShip.shootAtTarget(ship);
-//                        alienShoots.add(alienShot);
-//                        pane.getChildren().add(alienShot.getCharacter());
-//                        // Reset the framesSinceLastShot counter
-//                        framesSinceLastAlienShot = 0;
-//                    }
-//                }
-//            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-//            private void damageShip() {
-//                if (!ship.isInvincible()) {
-//                    HP.decrementAndGet();
-//
-//                    if (HP.get() > 0) {
-//                        moveShipToSafety();
-//                        ship.setMovement(ship.getMovement().normalize());
-//
-//                        ship.setInvincible(true); // Set ship invincible
-//
-//                        // Blinking animation
-//                        Timeline blinkTimeline = new Timeline(
-//                                new KeyFrame(Duration.ZERO, e -> ship.getCharacter().setVisible(true)),
-//                                new KeyFrame(Duration.millis(100), e -> ship.getCharacter().setVisible(false)),
-//                                new KeyFrame(Duration.millis(200), e -> ship.getCharacter().setVisible(true))
-//                        );
-//                        blinkTimeline.setCycleCount(15); // Number of blinks (15 blinks in 3 seconds)
-//                        blinkTimeline.play();
-//
-//                        Timer timer = new Timer();
-//                        timer.schedule(new TimerTask() {
-//                            @Override
-//                            public void run() {
-//                                ship.setInvincible(false); // Remove invincibility after 3 seconds
-//                                ship.getCharacter().setVisible(true); // Ensure the ship is visible after the invincibility period
-//                            }
-//                        }, 3000);
-//                    } else {
-//                        stop();
-//                        pane.getChildren().clear();
-//                        int finalPoints = points.get();
-//                        Scene gameOverScene = new GameOver().showGameOverScreen(stage, finalPoints);
-//                        stage.setScene(gameOverScene);
-//                    }
-//                }
-//
-//            }
-
-//
