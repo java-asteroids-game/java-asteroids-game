@@ -7,7 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 public class ScoreManager {
-    // Append score to a local file
+    /*
+    Class that has two methods: appendScoreToFile and outputThreeHighestScore
+    First method is called when the game has finished and the summed points of the player are then saved to a local text file to be read later
+    When outputThreeHighestScores is called the file is read and then sorted as per a HashMap, then the naems and scores of the players who scored the 3 highest points are outputted to the High Score pane
+    */
     public void appendScoreToFile(String name, int score) {
         File file = new File("scores.txt");
         String filePath = file.getAbsolutePath();

@@ -15,6 +15,13 @@ import java.util.ArrayList;
 
 
 public class ScoreWindow {
+    /*
+        Has multiple methods:
+        Load - sets the scene and other window popup properties to populate with the high scores
+        showHighScoresScreen/createHighScoreScreen - calls the methods in ScoreManager to initiate a class and then return the top 3 scores
+        Vbox methods - used to display the scores on the screen and to animate them
+     */
+
     //game window size
     public static final int WIDTH = 500;
     public static final int HEIGHT = 400;
@@ -54,6 +61,7 @@ public class ScoreWindow {
         return new Scene(scorePane);
     }
 
+    //creates the vbox and sets the title
     private static VBox createVBoxWithTitle(){
         // Create the high score title
         Text highScoreTitle = new Text("High Score");
@@ -72,6 +80,7 @@ public class ScoreWindow {
 
     }
 
+    //adds the text and scores to the vbox
     private static void addHighScoreListToVBox(ArrayList<String> highScores, VBox VBoxToAppend) {
         for (String line : highScores) {
             Text highScore = new Text(line);
@@ -90,6 +99,7 @@ public class ScoreWindow {
         }
     }
 
+    //adds restart button
     private static void addRestartLabelToVBox(VBox VBoxToAppend){
             Label restart = new Label("Click to Restart Game");
             restart.setStyle("-fx-font: 20 Consolas;");

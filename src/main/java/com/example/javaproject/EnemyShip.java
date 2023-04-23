@@ -30,8 +30,8 @@ public class EnemyShip extends AbstractGameElement implements Ship{
     }
 
     /*
-     * Since the alien ship needs to be able to move randomly, we set two times to monitor the length of the alien ship's movement in one direction,
-     * and change its direction of movement by random values when it exceeds a certain value
+     Since the alien ship needs to be able to move randomly, we set two times to monitor the length of the alien ship's movement in one direction,
+     and change its direction of movement by random values when it exceeds a certain value
      */
     public void move() {
         long currentTime = currentTimeMillis();

@@ -6,7 +6,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 public class IndexController {
-
+    //sets up the FXML screen/interface for the start game, high score, and controls button
+    //when buttons on the screen are pressed, tells the program which functions to call
     @FXML
     private Label startgame;
 

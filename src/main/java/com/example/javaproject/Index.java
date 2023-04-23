@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class Index {
-
+    //  loads the FXML file and sets the scene
     public static void load(Stage stage) {
         try {
             Parent root = FXMLLoader.load(Index.class.getResource("index.fxml"));

@@ -15,6 +15,12 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class GameOver {
+    /*
+    Has a GameOver, displayHighScore and showGameOverScreen method
+    The first method is just used to initialise the ScoreManager method
+    The second method gets the player's name and appends the name/score to the file if the name wasn't null
+    The last method deals with creating the appropriate panes and windows
+    */
     int points;
     ScoreManager scoreManager ;
 
