@@ -33,8 +33,8 @@ public class ControlsWindow extends BaseGame {
     @Override
     protected List<Text> setupUITextElements(Pane pane){
         Text titleText = new Text(((double) WIDTH /2 -60), 80, "Controls");
-        Text controlText = new Text(((double) WIDTH /2 -280), 440, "W / UP: Accelerate     A / LEFT: Turn Left     D / RIGHT: Turn Right");
-        Text controlText1 = new Text(((double) WIDTH /2 - 170), 480, "Space: Shoot    Shift: Hyperspace Jump");
+        Text controlText = new Text(((double) WIDTH /2 -370), 440, "W / UP: Accelerate     A / LEFT: Turn Left     D / RIGHT: Turn Right");
+        Text controlText1 = new Text(((double) WIDTH /2 - 200), 480, "Space: Shoot    Shift: Hyperspace Jump");
         Text exitText = new Text(((double) WIDTH /2 - 120), 520, "Press ESC for Main Screen");
 
         List<Text> textElements = Arrays.asList(titleText, controlText, controlText1, exitText);

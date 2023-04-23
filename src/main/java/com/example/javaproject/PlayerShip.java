@@ -35,6 +35,10 @@ public class PlayerShip extends AbstractGameElement implements Ship {
         this.movement = this.movement.add(changeX, changeY);
     }
 
+    /*The invincible variable setted default value as false
+    Only set to true each time the ship is destroyed and reset
+    When invincible is True, the player ship will ignore collide.
+    * */
     public boolean isInvincible() {
         return invincible;
     }
@@ -51,6 +55,9 @@ public class PlayerShip extends AbstractGameElement implements Ship {
         return collisionArea.getBoundsInLocal().getWidth() != -1;
     }
 
+    /*The shoot method will allow player ship fire bullet
+    * When calling this method, a projectile object will create at player ship's location, then set the movement for the projectile
+    * */
     public Projectile shoot() {
         Projectile shot = new Projectile((int) this.getCharacter().getTranslateX(),
                 (int) this.getCharacter().getTranslateY(), ProjectileType.PLAYER);
@@ -60,6 +67,11 @@ public class PlayerShip extends AbstractGameElement implements Ship {
         return shot;
     }
 
+    /*We add a method to boolean whether a position is safe or not
+    this method will use for player ship's reset and SHIFT skill(Hyperspace jump)
+    The position shouldn't have the Asteriods, Alien Ship ,or Enemy bullets.
+    This can be achieved by passing in the corresponding object
+    * */
     private boolean isPositionNotSafe(List<AbstractGameElement> characters, int safeDistance) {
         Point2D newPosition = this.getPosition();
         // Check for collisions with other characters
@@ -71,6 +83,8 @@ public class PlayerShip extends AbstractGameElement implements Ship {
         return false;
     }
 
+    /*If the new location is safe, then we can move the player ship to this new position
+    * */
     public void moveSomewhereSafe(List<AbstractGameElement> characters, int safeDistance){
         double newTranslateX, newTranslateY;
         do {

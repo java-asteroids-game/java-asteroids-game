@@ -29,6 +29,10 @@ public class EnemyShip extends AbstractGameElement implements Ship{
 
     }
 
+    /*
+     * Since the alien ship needs to be able to move randomly, we set two times to monitor the length of the alien ship's movement in one direction,
+     * and change its direction of movement by random values when it exceeds a certain value
+     */
     public void move() {
         long currentTime = currentTimeMillis();
         long createdTime = this.getCreatedTime();
@@ -51,6 +55,11 @@ public class EnemyShip extends AbstractGameElement implements Ship{
         bounceOffScreen();
     }
 
+    /*
+    * This method allows the alien ship to shoot at the player ship,
+    * creates a bullet at the alien ship's position, calculates the angle with the player ship to determine the direction,
+    * and then sets the bullet's movement
+    * */
     public Projectile shoot() {
         // Set location to enemy ship location
         Projectile alienShoot = new Projectile((int) this.getCharacter().getTranslateX(), (int) this.getCharacter().getTranslateY(), ProjectileType.ALIEN);

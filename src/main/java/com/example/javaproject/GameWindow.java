@@ -9,7 +9,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyCode;
@@ -34,27 +33,34 @@ public class GameWindow extends BaseGame{
     EnemyShip alienShip = new EnemyShip(WIDTH / 2, HEIGHT / 2, ship);
     List<Projectile> alienShoots = new ArrayList<>();
 
+    // Declare boolean for cheater state of the game
     public boolean isCheating = false;
 
     // Set atomic integers with initial values
     AtomicInteger points = new AtomicInteger(0);
     AtomicInteger level = new AtomicInteger(1);
     AtomicInteger HP = new AtomicInteger(3);
-    ProgressBar progressBar;
+    ProgressBar burnoutBar;
 
+    // Declare boolean for gameOver
     boolean gameOver = false;
 
     public void load(Stage stage, int numAsteroids) {
+        // Set game over to false when game is loaded
         gameOver = false;
         this.stage = stage;
+
+        // Set up the game with however many asteroids are required
         setupGame(numAsteroids);
-        progressBar = setupProgressBar(pane);
+        burnoutBar = setupBurnoutBar(pane);
         setupAlienGenerator();
         spawnSpecialAsteroid();
         isCheating = false;
 
+        // Start the animation timer
         new AnimationTimer() {
 
+            // Call the animation handle method, and if the game is over, stop.
             @Override
             public void handle(long now) {
                 animationHandle();
@@ -62,7 +68,6 @@ public class GameWindow extends BaseGame{
                     stop();
                 }
             }
-
         }.start();
 
         //show everything in window
@@ -71,6 +76,8 @@ public class GameWindow extends BaseGame{
         stage.show();
     }
 
+    // Method to handle player input, inherits from the base class
+    // Additional functionality for cheat code, player can press U to cheat
     @Override
     protected void handleKeyInput(){
         super.handleKeyInput();
@@ -78,10 +85,10 @@ public class GameWindow extends BaseGame{
             handleCheating();
         }
     }
-    @Override
-    protected void handleShipShooting() {
-        super.handleShipShooting();
 
+    // Create an observable list of bullets to display on the progress bar
+    // When bullets are added or removed from the shoots list the progress bar is updated
+    private void updateBurnoutBar(){
         ObservableList<Projectile> observableShots = FXCollections.observableList(shoots);
         DoubleBinding progressBinding = Bindings.createDoubleBinding(() -> {
             if (observableShots.size() == 0) {
@@ -92,8 +99,11 @@ public class GameWindow extends BaseGame{
                 return (double) observableShots.size() / 4;
             }
         }, observableShots);
-        progressBar.progressProperty().bind(progressBinding);
+        burnoutBar.progressProperty().bind(progressBinding);
     }
+
+    // Checks whether alien is alive, and how long it has been since the last alien shot
+    // Calls the alienShip.shoot method to shoot at the player every 100 frames
     private void handleAlienShooting() {
         if (alienShip.isAlive()) {
             if (framesSinceLastAlienShot >= 100) {
@@ -105,17 +115,27 @@ public class GameWindow extends BaseGame{
             }
         }
     }
+
+    // If the player is past level 3 and it's been 250 frames since the last cheat
+    // Call the cheat method, which removes all asteroids from the pane
     private void handleCheating(){
         if  (level.get() >= 3 && framesSinceLastGodMode > 250){
             cheat(pane);
             framesSinceLastGodMode = 0;
         }
     }
+
+    // Use the BaseGame's handle collision method plus adds the functionality to
+    // handle alien bullet collisions with the player.
     @Override
     protected void handleCollisions() {
         super.handleCollisions();
         manageAlienBulletCollisions();
     }
+
+    // Use the BaseGame's check bullet collisions method to check for asteroid / bullet collisions
+    // Add the ability to check for alien / bullet collisions
+    // Add the ability to update Points on asteroid/bullet collisions
     @Override
     protected int checkBulletCollisions(Projectile shoot){
         int deadAsteroidCount= super.checkBulletCollisions(shoot);
@@ -130,6 +150,9 @@ public class GameWindow extends BaseGame{
 
         return deadAsteroidCount;
     }
+
+    // Use the BaseGame's manage asteroids method, but reduce HP when the ship and
+    // asteroid collide
     @Override
     protected void manageAsteroids(){
         super.manageAsteroids();
@@ -141,35 +164,54 @@ public class GameWindow extends BaseGame{
             }
         });
     }
+
+    // Use the BaseGame's handle move objects method, but add in movement for the alien
+    // and its bullets
     @Override
     protected void handleMoveObjects() {
         super.handleMoveObjects();
         alienShip.move();
         alienShoots.forEach(alienShoot -> alienShoot.move());
     }
+
+    // Use the Base Game's handle update frame counters
+    // Also include the alien bullet counter and the cheat code counter
     @Override
     protected void handleUpdateFrameCounters(){
         super.handleUpdateFrameCounters();
         framesSinceLastAlienShot++;
         framesSinceLastGodMode++;
     }
+
+    // Use the Base Game's move ship to safety method
+    // Add the alienship and alien bullets to characters to avoid
     @Override
     protected void handleMoveShipToSafety(){
         characters.add(alienShip);
         characters.addAll(alienShoots);
         super.handleMoveShipToSafety();
     }
+
+    // Override then Base Game's animation handle to include the
+    // animations for aliens,
     @Override
     protected void animationHandle() {
         super.animationHandle();
         handleAlienShooting();
         updateGameInformation(UITextElements);
+        updateBurnoutBar();
+
     }
+
+    // Create a special asteroid and add it to the scene
     private void spawnSpecialAsteroid(){
         Asteroid asteroid_special = new Asteroid(WIDTH / 2, 500, AsteroidType.SPECIAL);
         asteroids.add(asteroid_special);
         pane.getChildren().add(asteroid_special.getCharacter());
     }
+
+    // Iterate through the alien's bullets, check if it's gone out of bounds to remove
+    // Check if it's collided with the ship. If so damage the ship
     private void manageAlienBulletCollisions(){
         //iterator required to avoid concurrent modification exception (removing item from list while iterating through it)
         Iterator<Projectile> alienProjectileIterator = alienShoots.iterator();
@@ -185,11 +227,13 @@ public class GameWindow extends BaseGame{
                 alienProjectileIterator.remove();
                 pane.getChildren().remove(alienShoot.getCharacter());
                 damageShip();
-            } else {
-                alienShoot.move();
             }
         }
     }
+
+    // Damage the ship if it is not invincible. Checks if HP has gone below 0. If not,
+    // Set the ship to invincible and blink. If it has, set game over to true call the game over method.
+    // and set the screen to the game over screen.
     private void damageShip() {
         if (!ship.isInvincible()) {
             HP.decrementAndGet();
@@ -228,6 +272,7 @@ public class GameWindow extends BaseGame{
 
     }
 
+    // Set up the UI elements. Create the text, place it on the screen, add it to the pane
     @Override
     protected List<Text> setupUITextElements(Pane pane){
         // Show current points ,current level, and current HP
@@ -245,16 +290,21 @@ public class GameWindow extends BaseGame{
 
         return textElements;
     }
-    private ProgressBar setupProgressBar(Pane pane){
-        ProgressBar progressBar = new ProgressBar();
-        progressBar.setPrefWidth(WIDTH - 870);
-        progressBar.setLayoutX(30);
-        progressBar.setLayoutY(HEIGHT - 500);
-        progressBar.setProgress(0);
-        pane.getChildren().add(progressBar);
 
-        return progressBar;
+    // Set up the burnout bar, place it on the screen, add it to the pane.
+    private ProgressBar setupBurnoutBar(Pane pane){
+        burnoutBar = new ProgressBar();
+        burnoutBar.setPrefWidth(WIDTH - 870);
+        burnoutBar.setLayoutX(30);
+        burnoutBar.setLayoutY(HEIGHT - 500);
+        burnoutBar.setProgress(0);
+        pane.getChildren().add(burnoutBar);
+
+        return burnoutBar;
     }
+
+    // Increment points by 100 every time an asteroid is hit, increment the level
+    // every 1000 points and add a life every 5000 points.
     private void asteroidsHitUpdatePoints() {
         if(!isCheating){
             points.set(points.get() + 100);
@@ -267,18 +317,22 @@ public class GameWindow extends BaseGame{
             }
         }
     }
+    
+    // Method to update the displayed Points, Lives, and Level
     private void updateGameInformation(List<Text> textElements) {
         textElements.get(0).setText("Points: " + points);
         textElements.get(2).setText("Lives: " + HP);
         textElements.get(1).setText("Level: " + level);
-        textElements.forEach(Node::toFront);
+        textElements.forEach(textElement -> textElement.toFront());
     }
+    
+    // Method for cheating. Destroys the asteroids on the screen and lets you know
+    // that cheaters never prosper
     private void cheat(Pane pane){
         isCheating = true;
         //creates text to display when user cheats
-
         Text cheatText = new Text("CHEATERS LOSE THEIR POINTS");
-        cheatText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        cheatText.setFont(Font.font("Consolas", FontWeight.BOLD, 24));
         cheatText.setFill(Color.RED);
         cheatText.setLayoutX(310);
         cheatText.setLayoutY(300);
@@ -286,17 +340,15 @@ public class GameWindow extends BaseGame{
 
         pane.getChildren().add(cheatText);
 
-        //sets the duration and opacity for appearance of cheatText (alternates on/off)
+        // Sets the duration and opacity for appearance of cheatText (alternates on/off)
         Timeline cheatTimeline = new Timeline(
                 new KeyFrame(Duration.seconds(0.5), e -> cheatText.setOpacity(1.0)),
                 new KeyFrame(Duration.seconds(1.0), e -> cheatText.setOpacity(0.0))
         );
-        //sets the cycle as indefinite - remains until gameover
+        // Sets the cycle as indefinite - remains until gameover
         cheatTimeline.setCycleCount(Timeline.INDEFINITE);
         cheatTimeline.play();
-
-
-
+        
         // Clears asteroids
         asteroids.forEach(asteroid -> {
             pane.getChildren().remove(asteroid.getCharacter());
@@ -307,11 +359,15 @@ public class GameWindow extends BaseGame{
         points.set(0);
 
     }
+
+    // Set up the timeline for the alien, every 15 seconds he shows up
+    // Set the timeline to set the alien to alive, position him somewhere on the screen,
+    // and add him to the pane
     private void setupAlienGenerator(){
         // Creates the generator for the alien. Sets up timeline events to check if the alien is alive
         Timeline alienGenerator = new Timeline();
         alienGenerator.getKeyFrames().add(
-                new KeyFrame(Duration.seconds(20), event -> {
+                new KeyFrame(Duration.seconds(15), event -> {
                     if (!alienShip.isAlive()) {
                         framesSinceLastAlienShot = 0;
                         alienShip.getCharacter().setTranslateX(Math.random() * WIDTH);
